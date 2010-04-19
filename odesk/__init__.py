@@ -174,10 +174,13 @@ class Client(BaseClient):
         result = self.get(url)
         return result['teamrooms']['teamroom']
 
-    def get_team_room(self, team_id, online='now'):
+    def get_snapshots(self, team_id, online='now'):
         url = 'https://www.odesk.com/api/team/v1/teamrooms/%s' % team_id
         result = self.get(url, {'online':online})
-        return result['teamroom']['snapshot']
+        snapshots = result['teamroom']['snapshot']
+        if not isinstance(snapshots, list):
+            snapshots = [snapshots]
+        return snapshots
 
 
 
