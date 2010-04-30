@@ -21,7 +21,6 @@ class HTTP404NotFoundError(urllib2.HTTPError):
 
 
 
-
 def signed_urlencode(secret, query={}):
     """
     Converts a mapping object to signed url query
@@ -47,7 +46,7 @@ class HttpRequest(urllib2.Request):
     def __init__(self, *args, **kwargs):
         #Request is an old-style class, so can't use `super`
         method = kwargs.pop('method','GET')
-        urllib2.Request.__init__(self,*args, **kwargs)
+        urllib2.Request.__init__(self, *args, **kwargs)
         self.method = method
 
     def get_method(self):
@@ -125,57 +124,119 @@ class BaseClient(object):
 
 
 
-
 class Client(BaseClient):
     """
-    Default client that uses JSON to talk to oDesk APIs
+    Main API client
     """
 
+    def __init__(self, public_key, secret_key, api_token=None, format='json'):
+        self.public_key = public_key
+        self.secret_key = secret_key
+        self.api_token = api_token
+        self.format = format
+        #Namespaces
+        self.auth = Auth(self)
+        self.team = Team(self)
+
+    #Shortcuts for HTTP methods
     def get(self, url, data={}):
-        return self.read(url, data, method='GET', format='json')
+        return self.read(url, data, method='GET', format=self.format)
 
     def post(self, url, data={}):
-        return self.read(url, data, method='POST', format='json')
+        return self.read(url, data, method='POST', format=self.format)
         
     def put(self, url, data={}):
-        return self.read(url, data, method='PUT', format='json')
+        return self.read(url, data, method='PUT', format=self.format)
         
     def delete(self, url, data={}):
-        return self.read(url, data, method='DELETE', format='json')
+        return self.read(url, data, method='DELETE', format=self.format)
+
+
+
+class Namespace(object):
+    """
+    A special 'proxy' class to keep API methods organized
+    """
+
+    base_url = 'https://www.odesk.com/api/'
+    api_url = None
+    version = 1
+
+    def __init__(self, client):
+        self.client = client
+
+    def full_url(self, url):
+        """
+        Gets relative URL of API method and returns a full URL
+        """
+        return "%s%sv%d/%s" % (self.base_url, self.api_url, self.version, url)
+
+    #Proxied client's methods
+    def get(self, url, data={}):
+        return self.client.get(self.full_url(url), data)
+
+    def post(self, url, data={}):
+        return self.client.post(self.full_url(url), data)
+
+    def put(self, url, data={}):
+        return self.client.put(self.full_url(url), data)
+
+    def delete(self, url, data={}):
+        return self.client.delete(self.full_url(url), data)
+
+
+
+class Auth(Namespace):
+    
+    api_url = 'auth/'
+    version = 1
 
     def auth_url(self, frob=None):
+        """
+        Returns authentication URL to be used in a browser
+        In case of desktop (non-web) application a frob is required
+        """
         data = {}
         if frob:
             data['frob'] = frob
-        url = 'https://www.odesk.com/services/api/auth/?'+self.urlencode(data)
+        url = 'https://www.odesk.com/services/api/auth/?'+self.client.urlencode(data)
         return url 
 
     def get_frob(self):
-        url = 'https://www.odesk.com/api/auth/v1/keys/frobs'
+        url = 'keys/frobs'
         result = self.post(url)
         return result['frob']
 
     def get_token(self, frob):
-        url = 'https://www.odesk.com/api/auth/v1/keys/tokens'
+        """
+        Gets authentication token
+        """
+        url = 'keys/tokens'
         result = self.post(url, {'frob':frob})
-        #TODO: Maybe there's a better way to get user's info
+        #TODO: Maybe there's a better way to get user's info?
         return result['token'], result['auth_user']
 
     def check_token(self):
-        url = 'https://www.odesk.com/api/auth/v1/keys/token'
+        url = 'keys/token'
         try:
             result = self.get(url)
             return True
         except HTTP403ForbiddenError:
             return False
 
-    def get_team_rooms(self):
-        url = 'https://www.odesk.com/api/team/v1/teamrooms'
+
+class Team(Namespace):
+    
+    api_url = 'team/'
+    version = 1
+    
+    def get_teamrooms(self):
+        url = 'teamrooms'
         result = self.get(url)
         return result['teamrooms']['teamroom']
 
     def get_snapshots(self, team_id, online='now'):
-        url = 'https://www.odesk.com/api/team/v1/teamrooms/%s' % team_id
+        url = 'teamrooms/%s' % team_id
         result = self.get(url, {'online':online})
         snapshots = result['teamroom']['snapshot']
         if not isinstance(snapshots, list):
@@ -183,8 +244,6 @@ class Client(BaseClient):
         return snapshots
 
 
-
-    
 
 if __name__ == "__main__":
     import doctest
