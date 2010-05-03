@@ -19,7 +19,8 @@ class HTTP403ForbiddenError(urllib2.HTTPError):
 class HTTP404NotFoundError(urllib2.HTTPError):
     pass
 
-
+class InvalidConfiguredException(Exception):
+    pass
 
 def signed_urlencode(secret, query={}):
     """
@@ -246,16 +247,19 @@ class Team(Namespace):
 
 
 class HR2(Namespace):
+    """
+    HRv2 API
+    """    
     api_url = 'hr/'
     version = 2
     
-    #user api
+    '''user api'''
     def get_user(self, user_id):
         url = 'users/%s' % str(user_id)
         result = self.get(url)
         return result['user']
-   
-   #company api
+  
+    '''company api'''
     def get_companies(self):
         url = 'companies'
         result = self.get(url)
@@ -284,8 +288,8 @@ class HR2(Namespace):
         url = 'companies/%s/tasks' % str(company_id)
         result = self.get(url)
         return result['tasks']
-                
-    #team api
+   
+    '''team api'''
     def get_teams(self):
         url = 'teams'
         result = self.get(url)
@@ -310,7 +314,28 @@ class HR2(Namespace):
         url = 'teams/%s/tasks' % str(team_id)
         result = self.get(url)
         return result['tasks']
-                
+          
+    '''task api'''   
+    
+    '''userrole api'''
+    def get_user_role(self, user_id=None, team_id=None, sub_teams=False):
+        '''
+        Returns all the user roles that the user has in the teams.
+        '''
+        #TODO: this is assumption how API works. Check this
+        if (user_id and team_id) or (not user_id and not team_id):
+            raise InvalidConfiguredException("You must provide exactly 1 parameter - user_id or team_id")
+        data = {}
+        if user_id:
+            data = {'user__reference': user_id}
+        if team_id:
+            data = {'team__reference': team_id}     
+        data['include_sub_teams'] = sub_teams      
+        url = 'userroles'
+        result = self.get(url, data)
+        return result['userroles']
+
+    '''job api'''                
     def get_jobs(self):
         url = 'jobs'
         result = self.get(url)
@@ -320,7 +345,11 @@ class HR2(Namespace):
         url = 'jobs/%s' % str(job_id)
         result = self.get(url)
         return result        
-                
+            
+    '''offer api'''
+
+    '''engagement api'''
+             
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

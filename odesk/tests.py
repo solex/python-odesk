@@ -471,8 +471,10 @@ hr_dict = {u'auth_user':
                     u'description': u'test task',
                     u'url': u'http://url.odesk.com/task',
                     u'level': u'1',
-                    },    
-                       ]
+                    },],    
+            u'userroles': [{u'reference': u'test',
+                           u'user_reference': u'testuser',
+                           u'user_id': u'1',}],
                          
                 }
            
@@ -492,7 +494,7 @@ def test_get_hrv2():
     c = Client(public_key, secret_key, api_token)
     test_url = "http://test.url"
     
-    hr = HR2(c)
+    hr = c.hr
     
     #test get_user
     assert hr.get_user(1) == hr_dict[u'user'], hr.get_user(1)
@@ -523,5 +525,26 @@ def test_get_hrv2():
     
     #test get_team_tasks
     assert hr.get_team_tasks(1) == hr_dict['tasks'], hr.get_team_tasks(1)
-     
     
+    #test get_user_role
+    assert hr.get_user_role(user_id=1) == hr_dict['userroles'],\
+                                                 hr.get_user_role(user_id=1)
+    assert hr.get_user_role(team_id=1) == hr_dict['userroles'],\
+                                                 hr.get_user_role(team_id=1)
+    assert hr.get_user_role(user_id=1) == hr_dict['userroles'],\
+                                                 hr.get_user_role(user_id=1)
+    try:
+        result = hr.get_user_role()
+        assert 0
+    except InvalidConfiguredException, e:
+        pass
+    except:
+        assert 0, "No params, but exception not raised"                                              
+
+    try:
+        result = hr.get_user_role(user_id=1, team_id=1)
+        assert 0
+    except InvalidConfiguredException, e:
+        pass
+    except:
+        assert 0, "Both params passed, but exception not raised"
