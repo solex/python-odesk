@@ -271,9 +271,13 @@ class HR2(Namespace):
         result = self.get(url)
         return result['teams']
   
-    def get_company_users(self, company_id):
+    def get_company_users(self, company_id, active=True):
         url = 'companies/%s/users' % str(company_id)
-        result = self.get(url)
+        if active:
+            data = {'status_in_company': 'active'}
+        else:
+            data = {'status_in_company': 'inactive'}
+        result = self.get(url, data)
         return result['users']
     
     def get_company_tasks(self, company_id):
@@ -282,16 +286,31 @@ class HR2(Namespace):
         return result['tasks']
                 
     #team api
-    def get_team(self, team_id):
-        url = 'teams/%s' % str(team_id)
+    def get_teams(self):
+        url = 'teams'
         result = self.get(url)
+        return result['teams']  
+        
+    def get_team(self, team_id, include_users=False):
+        url = 'teams/%s' % str(team_id)
+        result = self.get(url, {'include_users': include_users})
+        #TODO: check how included users returned
         return result['team']       
 
-    def get_team_users(self, team_id):
+    def get_team_users(self, team_id, active=True):
         url = 'teams/%s/users' % str(team_id)
-        result = self.get(url)
-        return result   
+        if active:
+            data = {'status_in_company': 'active'}
+        else:
+            data = {'status_in_company': 'inactive'}        
+        result = self.get(url, data)
+        return result['users']   
     
+    def get_team_tasks(self, team_id):
+        url = 'teams/%s/tasks' % str(team_id)
+        result = self.get(url)
+        return result['tasks']
+                
     def get_jobs(self):
         url = 'jobs'
         result = self.get(url)

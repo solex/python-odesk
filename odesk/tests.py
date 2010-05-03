@@ -497,7 +497,7 @@ def test_get_hrv2():
     #test get_user
     assert hr.get_user(1) == hr_dict[u'user'], hr.get_user(1)
 
-    #test get_company
+    #test get_companies
     assert hr.get_companies() == hr_dict[u'companies'], hr.get_companies()
     
     #test get_company
@@ -509,11 +509,19 @@ def test_get_hrv2():
     #test get_company_users
     assert hr.get_company_users(1) == hr_dict['users'], hr.get_company_users(1)
 
-    #test get_company_users
+    #test get_company_tasks
     assert hr.get_company_tasks(1) == hr_dict['tasks'], hr.get_company_tasks(1)
-        
+     
+    #test get_teams
+    assert hr.get_teams() == hr_dict[u'teams'], hr.get_teams()
+            
     #test get_team
     assert hr.get_team(1) == hr_dict[u'team'], hr.get_team(1)
         
     #test get_team_users
-    #assert hr.get_team_users(1) == hr_dict[u'team'], hr.get_team_users(1)
+    assert hr.get_team_users(1) == hr_dict[u'users'], hr.get_team_users(1)
+    
+    #test get_team_tasks
+    assert hr.get_team_tasks(1) == hr_dict['tasks'], hr.get_team_tasks(1)
+     
+    
