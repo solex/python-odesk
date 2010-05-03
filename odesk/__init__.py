@@ -137,6 +137,7 @@ class Client(BaseClient):
         #Namespaces
         self.auth = Auth(self)
         self.team = Team(self)
+        self.hr = HR2(self)
 
     #Shortcuts for HTTP methods
     def get(self, url, data={}):
@@ -244,6 +245,16 @@ class Team(Namespace):
         return snapshots
 
 
+class HR2(Namespace):
+    """
+    """ 
+    api_url = 'hr/'
+    version = 2
+    
+    def get_user(self, user_id):
+        url = 'users/%s' % str(user_id)
+        result = self.get(url)
+        return result['user']
 
 if __name__ == "__main__":
     import doctest

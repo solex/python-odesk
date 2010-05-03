@@ -387,5 +387,41 @@ def test_team():
     #test get_snapshots
     assert te.get_snapshots(1) == [teamrooms_dict['teamroom']['snapshot']],\
          te.get_snapshots(1)
-   
+
+
+hr_dict = {u'auth_user': 
+           {u'first_name': u'TestF', u'last_name': u'TestL', 
+            u'uid': u'testuser', u'timezone_offset': u'0', 
+            u'timezone': u'Europe/Athens', u'mail': u'test_user@odesk.com', 
+            u'messenger_id': u'', u'messenger_type': u'yahoo'}, 
+            u'server_time': u'1272877134', 
+           u'user': 
+            {u'status': u'active', u'first_name': u'TestF', 
+             u'last_name': u'TestL', u'reference': u'0001', 
+             u'timezone_offset': u'10800', 
+             u'public_url': u'http://www.odesk.com/users/~~000', 
+             u'is_provider': u'1', 
+             u'timezone': u'GMT+02:00 Athens, Helsinki, Istanbul', 
+             u'id': u'testuser'}}
+           
+
+def return_hr_json():
+    return json.dumps(hr_dict)
+
+def patched_urlopen_hr(request, *args, **kwargs):
+    request.read = return_hr_json
+    return request
+
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_hrv2():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+    
+    hr = HR2(c)
+    
+    #test get_user
+    assert hr.get_user(1) == hr_dict[u'user'], hr.get_user(1)
         
