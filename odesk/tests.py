@@ -402,7 +402,79 @@ hr_dict = {u'auth_user':
              u'public_url': u'http://www.odesk.com/users/~~000', 
              u'is_provider': u'1', 
              u'timezone': u'GMT+02:00 Athens, Helsinki, Istanbul', 
-             u'id': u'testuser'}}
+             u'id': u'testuser'},
+            u'team': 
+                {u'status': u'active', u'parent_team__reference': u'0', 
+                 u'name': u'Test', 
+                 u'reference': u'1', 
+                 u'company__reference': u'1', 
+                 u'id': u'test', 
+                 u'parent_team__id': u'test_parent', 
+                 u'company_name': u'Test', u'is_hidden': u'', 
+                 u'parent_team__name': u'Test parent'},
+            u'company': 
+                {u'status': u'active',  
+                 u'name': u'Test', 
+                 u'reference': u'1', 
+                 u'company_id': u'1',
+                 u'owner_user_id': u'1', },
+            u'teams': [
+                    {u'status': u'active', 'id': u'1', 
+                     u'name': u'Test', 
+                     u'reference': u'1',},
+                    {u'status': u'active', 'id': u'2', 
+                     u'name': u'Test2', 
+                     u'reference': u'2',},
+                    {u'status': u'closed', 'id': u'3', 
+                     u'name': u'Test3', 
+                     u'reference': u'3',},
+                  ],
+            u'companies': [            
+                {u'status': u'active',  
+                 u'name': u'Test', 
+                 u'reference': u'1', 
+                 u'company_id': u'1',
+                 u'owner_user_id': u'1', },
+                 {u'status': u'inactive',  
+                 u'name': u'Test2', 
+                 u'reference': u'2', 
+                 u'company_id': u'2',
+                 u'owner_user_id': u'2', },                 
+                 ],
+            u'users': [
+                {u'status_in_company': u'active', 
+                 u'first_name': u'TestF', 
+                 u'last_name': u'TestL', 
+                 u'reference': u'0001', 
+                 u'email': u'test@test.url',
+                 u'odesk_email': u'test@odesk.com',
+                 u'is_provider': u'1',
+                 u'is_on_engagement': u'1',
+                 u'id': u'testuser'
+                 },
+                 {u'status_in_company': u'inactive', 
+                 u'first_name': u'TestF2', 
+                 u'last_name': u'TestL2', 
+                 u'reference': u'0002', 
+                 u'email': u'test2@test.url',
+                 u'odesk_email': u'test2@odesk.com',
+                 u'is_provider': u'0',
+                 u'is_on_engagement': u'0',
+                 u'id': u'testuser'
+                 },],
+            u'tasks': [
+                   { u'reference': u'test',
+                    u'company_reference': u'1',
+                    u'team_reference': u'1',
+                    u'user_reference': u'1',
+                    u'code': u'1',
+                    u'description': u'test task',
+                    u'url': u'http://url.odesk.com/task',
+                    u'level': u'1',
+                    },    
+                       ]
+                         
+                }
            
 
 def return_hr_json():
@@ -413,7 +485,7 @@ def patched_urlopen_hr(request, *args, **kwargs):
     return request
 
 @patch('urllib2.urlopen', patched_urlopen_hr)  
-def test_hrv2():
+def test_get_hrv2():
     public_key = 'public'
     secret_key = 'secret'
     api_token = 'some_token'
@@ -424,4 +496,24 @@ def test_hrv2():
     
     #test get_user
     assert hr.get_user(1) == hr_dict[u'user'], hr.get_user(1)
+
+    #test get_company
+    assert hr.get_companies() == hr_dict[u'companies'], hr.get_companies()
+    
+    #test get_company
+    assert hr.get_company(1) == hr_dict[u'company'], hr.get_company(1)
+    
+    #test get_company_teams
+    assert hr.get_company_teams(1) == hr_dict['teams'], hr.get_company_teams(1)
+
+    #test get_company_users
+    assert hr.get_company_users(1) == hr_dict['users'], hr.get_company_users(1)
+
+    #test get_company_users
+    assert hr.get_company_tasks(1) == hr_dict['tasks'], hr.get_company_tasks(1)
         
+    #test get_team
+    assert hr.get_team(1) == hr_dict[u'team'], hr.get_team(1)
+        
+    #test get_team_users
+    #assert hr.get_team_users(1) == hr_dict[u'team'], hr.get_team_users(1)

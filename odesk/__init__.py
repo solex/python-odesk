@@ -246,16 +246,62 @@ class Team(Namespace):
 
 
 class HR2(Namespace):
-    """
-    """ 
     api_url = 'hr/'
     version = 2
     
+    #user api
     def get_user(self, user_id):
         url = 'users/%s' % str(user_id)
         result = self.get(url)
         return result['user']
+   
+   #company api
+    def get_companies(self):
+        url = 'companies'
+        result = self.get(url)
+        return result['companies']
+    
+    def get_company(self, company_id):
+        url = 'companies/%s' % str(company_id)
+        result = self.get(url)
+        return result['company']
+    
+    def get_company_teams(self, company_id):
+        url = 'companies/%s/teams' % str(company_id)
+        result = self.get(url)
+        return result['teams']
+  
+    def get_company_users(self, company_id):
+        url = 'companies/%s/users' % str(company_id)
+        result = self.get(url)
+        return result['users']
+    
+    def get_company_tasks(self, company_id):
+        url = 'companies/%s/tasks' % str(company_id)
+        result = self.get(url)
+        return result['tasks']
+                
+    #team api
+    def get_team(self, team_id):
+        url = 'teams/%s' % str(team_id)
+        result = self.get(url)
+        return result['team']       
 
+    def get_team_users(self, team_id):
+        url = 'teams/%s/users' % str(team_id)
+        result = self.get(url)
+        return result   
+    
+    def get_jobs(self):
+        url = 'jobs'
+        result = self.get(url)
+        return result           
+ 
+    def get_job(self, job_id):
+        url = 'jobs/%s' % str(job_id)
+        result = self.get(url)
+        return result        
+                
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
