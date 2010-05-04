@@ -323,10 +323,6 @@ class HR2(Namespace):
         '''
         Returns all the user roles that the user has in the teams.
         '''
-        if (user_id and team_id) or (not user_id and not team_id):
-            raise InvalidConfiguredException(\
-                    "You must provide exactly 1 parameter - user_id or team_id")
-
         data = {}
         if user_id:
             data = {'user__reference': user_id}

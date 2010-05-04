@@ -37,6 +37,8 @@ def web_based_app(public_key, secret_key):
     print client.hr.get_offers()
     print "HR: get_engagements"
     print client.hr.get_engagements()   
+    print "HR: userroles"
+    print client.hr.get_user_role()
 
 if __name__ == '__main__':
     public_key = PUBLIC_KEY or raw_input('Enter public key: ')

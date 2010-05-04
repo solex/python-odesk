@@ -390,7 +390,7 @@ def test_team():
 
 
 userroles = {u'userrole': 
-             {u'parent_team__reference': u'1', 
+             [{u'parent_team__reference': u'1', 
               u'user__id': u'testuser', u'team__id': u'test:t', 
               u'reference': u'1', u'team__name': u'te', 
               u'company__reference': u'1', 
@@ -403,7 +403,7 @@ userroles = {u'userrole':
               u'parent_team__name': u'TestDev', u'has_team_room_access': u'1', 
               u'company__name': u'Test Dev', 
               u'permissions': 
-                {u'permission': [u'manage_employment', u'manage_recruiting']}}}
+                {u'permission': [u'manage_employment', u'manage_recruiting']}}]}
 
 engagement = {u'status': u'active', 
               u'buyer_team__reference': u'1', u'provider__reference': u'2', 
@@ -587,23 +587,8 @@ def test_get_hrv2():
                                                  hr.get_user_role(user_id=1)
     assert hr.get_user_role(team_id=1) == hr_dict['userroles'],\
                                                  hr.get_user_role(team_id=1)
-    assert hr.get_user_role(user_id=1) == hr_dict['userroles'],\
-                                                 hr.get_user_role(user_id=1)
-    try:
-        result = hr.get_user_role()
-        assert 0
-    except InvalidConfiguredException, e:
-        pass
-    except:
-        assert 0, "No params, but exception not raised"                                              
+    assert hr.get_user_role() == hr_dict['userroles'], hr.get_user_role()
 
-    try:
-        result = hr.get_user_role(user_id=1, team_id=1)
-        assert 0
-    except InvalidConfiguredException, e:
-        pass
-    except:
-        assert 0, "Both params passed, but exception not raised"
         
     try:
         assert hr.get_tasks() == hr_dict['tasks'], hr.get_tasks()
