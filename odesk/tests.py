@@ -609,4 +609,26 @@ def test_get_hrv2():
     #test get_engagements
     assert hr.get_engagements() == hr_dict[u'engagements'], hr.get_engagements()
     assert hr.get_engagement(1) == hr_dict[u'engagement'], hr.get_engagement(1)
+    
+adjustments = {u'adjustment' : {u'reference': '100'}}
+
+def return_hradjustment_json():
+    return json.dumps(adjustments)
+
+def patched_urlopen_hradjustment(request, *args, **kwargs):
+    request.read = return_hradjustment_json
+    return request
+
+@patch('urllib2.urlopen', patched_urlopen_hradjustment)  
+def test_hrv2_post_adjustment():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+    
+    hr = c.hr
+    result = hr.post_team_adjustment(1, 2, 100000, 'test', 'test note')
+    assert result == adjustments[u'adjustment'], result
+    
        

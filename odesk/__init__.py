@@ -312,7 +312,19 @@ class HR2(Namespace):
         else:
             data = {'status_in_team': 'inactive'}        
         result = self.get(url, data)
-        return result['users']   
+        return result['users']  
+    
+    def post_team_adjustment(self, team_id, engagement_id, amount, comments, notes):
+        '''
+        Add bonus to engagement
+        '''
+        url = 'teams/%s/adjustments' % str(team_id)
+        data = {'engagement__reference': engagement_id,
+                'amount': amount,
+                'comments': comments,
+                'notes': notes}
+        result = self.post(url, data)
+        return result['adjustment']
             
     '''task api'''   
     def get_tasks(self):
@@ -365,7 +377,7 @@ class HR2(Namespace):
         url = 'engagements/%s' % str(engagement_id)
         result = self.get(url)
         return result['engagement']  
-             
+    
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
