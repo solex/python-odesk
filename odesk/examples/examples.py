@@ -9,7 +9,6 @@ SECRET_KEY = '3fa4d68bbde53c83'
 
 #TODO: Desktop app example (check if it's working at all - wasn't last time)
 
-
 def web_based_app(public_key, secret_key):
     print "Emulating web-based app"
     #Instantiating a client without an auth token
@@ -29,9 +28,15 @@ def web_based_app(public_key, secret_key):
     client = odesk.Client(public_key, secret_key, auth_token)
     print "Team rooms:"
     print client.team.get_teamrooms()
-
-    
-    
+    #HRv2 API
+    print "HR: companies" 
+    print client.hr.get_companies()
+    print "HR: teams"
+    print client.hr.get_teams()
+    print "HR: offers"
+    print client.hr.get_offers()
+    print "HR: get_engagements"
+    print client.hr.get_engagements()   
 
 if __name__ == '__main__':
     public_key = PUBLIC_KEY or raw_input('Enter public key: ')

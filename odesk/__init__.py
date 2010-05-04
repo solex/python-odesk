@@ -22,6 +22,9 @@ class HTTP404NotFoundError(urllib2.HTTPError):
 class InvalidConfiguredException(Exception):
     pass
 
+class APINotImplementedException(Exception):
+    pass
+
 def signed_urlencode(secret, query={}):
     """
     Converts a mapping object to signed url query
@@ -275,20 +278,18 @@ class HR2(Namespace):
         result = self.get(url)
         return result['teams']
   
-    def get_company_users(self, company_id, active=True):
+    def get_company_tasks(self, company_id):
+        raise APINotImplementedException("API doesn't support this call yet")
+              
+    def get_company_users(self, company_id,  active=True):
         url = 'companies/%s/users' % str(company_id)
         if active:
             data = {'status_in_company': 'active'}
         else:
-            data = {'status_in_company': 'inactive'}
+            data = {'status_in_company': 'inactive'}        
         result = self.get(url, data)
-        return result['users']
-    
-    def get_company_tasks(self, company_id):
-        url = 'companies/%s/tasks' % str(company_id)
-        result = self.get(url)
-        return result['tasks']
-   
+        return result['users'] 
+      
     '''team api'''
     def get_teams(self):
         url = 'teams'
@@ -301,34 +302,35 @@ class HR2(Namespace):
         #TODO: check how included users returned
         return result['team']       
 
+    def get_team_tasks(self, team_id):
+        raise APINotImplementedException("API doesn't support this call yet")
+    
     def get_team_users(self, team_id, active=True):
         url = 'teams/%s/users' % str(team_id)
         if active:
-            data = {'status_in_company': 'active'}
+            data = {'status_in_team': 'active'}
         else:
-            data = {'status_in_company': 'inactive'}        
+            data = {'status_in_team': 'inactive'}        
         result = self.get(url, data)
         return result['users']   
-    
-    def get_team_tasks(self, team_id):
-        url = 'teams/%s/tasks' % str(team_id)
-        result = self.get(url)
-        return result['tasks']
-          
+            
     '''task api'''   
-    
+    def get_tasks(self):
+        raise APINotImplementedException("API doesn't support this call yet")
+            
     '''userrole api'''
     def get_user_role(self, user_id=None, team_id=None, sub_teams=False):
         '''
         Returns all the user roles that the user has in the teams.
         '''
-        #TODO: this is assumption how API works. Check this
         if (user_id and team_id) or (not user_id and not team_id):
-            raise InvalidConfiguredException("You must provide exactly 1 parameter - user_id or team_id")
+            raise InvalidConfiguredException(\
+                    "You must provide exactly 1 parameter - user_id or team_id")
+
         data = {}
         if user_id:
             data = {'user__reference': user_id}
-        if team_id:
+        elif team_id:
             data = {'team__reference': team_id}     
         data['include_sub_teams'] = sub_teams      
         url = 'userroles'
@@ -339,16 +341,34 @@ class HR2(Namespace):
     def get_jobs(self):
         url = 'jobs'
         result = self.get(url)
-        return result           
+        return result['jobs']           
  
     def get_job(self, job_id):
         url = 'jobs/%s' % str(job_id)
         result = self.get(url)
-        return result        
+        return result['job']       
             
     '''offer api'''
-
+    def get_offers(self):
+        url = 'offers'
+        result = self.get(url)
+        return result['offers'] 
+    
+    def get_offer(self, offer_id):
+        url = 'offers/%s' % str(offer_id)
+        result = self.get(url)
+        return result['offer']  
+        
     '''engagement api'''
+    def get_engagements(self):
+        url = 'engagements'
+        result = self.get(url)
+        return result['engagements']   
+
+    def get_engagement(self, engagement_id):
+        url = 'engagements/%s' % str(engagement_id)
+        result = self.get(url)
+        return result['engagement']  
              
 if __name__ == "__main__":
     import doctest

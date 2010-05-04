@@ -389,95 +389,140 @@ def test_team():
          te.get_snapshots(1)
 
 
-hr_dict = {u'auth_user': 
-           {u'first_name': u'TestF', u'last_name': u'TestL', 
-            u'uid': u'testuser', u'timezone_offset': u'0', 
-            u'timezone': u'Europe/Athens', u'mail': u'test_user@odesk.com', 
-            u'messenger_id': u'', u'messenger_type': u'yahoo'}, 
-            u'server_time': u'1272877134', 
-           u'user': 
-            {u'status': u'active', u'first_name': u'TestF', 
-             u'last_name': u'TestL', u'reference': u'0001', 
-             u'timezone_offset': u'10800', 
-             u'public_url': u'http://www.odesk.com/users/~~000', 
-             u'is_provider': u'1', 
-             u'timezone': u'GMT+02:00 Athens, Helsinki, Istanbul', 
-             u'id': u'testuser'},
-            u'team': 
-                {u'status': u'active', u'parent_team__reference': u'0', 
-                 u'name': u'Test', 
-                 u'reference': u'1', 
-                 u'company__reference': u'1', 
-                 u'id': u'test', 
-                 u'parent_team__id': u'test_parent', 
-                 u'company_name': u'Test', u'is_hidden': u'', 
-                 u'parent_team__name': u'Test parent'},
-            u'company': 
-                {u'status': u'active',  
-                 u'name': u'Test', 
-                 u'reference': u'1', 
-                 u'company_id': u'1',
-                 u'owner_user_id': u'1', },
-            u'teams': [
-                    {u'status': u'active', 'id': u'1', 
-                     u'name': u'Test', 
-                     u'reference': u'1',},
-                    {u'status': u'active', 'id': u'2', 
-                     u'name': u'Test2', 
-                     u'reference': u'2',},
-                    {u'status': u'closed', 'id': u'3', 
-                     u'name': u'Test3', 
-                     u'reference': u'3',},
-                  ],
-            u'companies': [            
-                {u'status': u'active',  
-                 u'name': u'Test', 
-                 u'reference': u'1', 
-                 u'company_id': u'1',
-                 u'owner_user_id': u'1', },
-                 {u'status': u'inactive',  
-                 u'name': u'Test2', 
-                 u'reference': u'2', 
-                 u'company_id': u'2',
-                 u'owner_user_id': u'2', },                 
-                 ],
-            u'users': [
-                {u'status_in_company': u'active', 
-                 u'first_name': u'TestF', 
-                 u'last_name': u'TestL', 
-                 u'reference': u'0001', 
-                 u'email': u'test@test.url',
-                 u'odesk_email': u'test@odesk.com',
-                 u'is_provider': u'1',
-                 u'is_on_engagement': u'1',
-                 u'id': u'testuser'
-                 },
-                 {u'status_in_company': u'inactive', 
-                 u'first_name': u'TestF2', 
-                 u'last_name': u'TestL2', 
-                 u'reference': u'0002', 
-                 u'email': u'test2@test.url',
-                 u'odesk_email': u'test2@odesk.com',
-                 u'is_provider': u'0',
-                 u'is_on_engagement': u'0',
-                 u'id': u'testuser'
-                 },],
-            u'tasks': [
-                   { u'reference': u'test',
-                    u'company_reference': u'1',
-                    u'team_reference': u'1',
-                    u'user_reference': u'1',
-                    u'code': u'1',
-                    u'description': u'test task',
-                    u'url': u'http://url.odesk.com/task',
-                    u'level': u'1',
-                    },],    
-            u'userroles': [{u'reference': u'test',
-                           u'user_reference': u'testuser',
-                           u'user_id': u'1',}],
-                         
-                }
-           
+userroles = {u'userrole': 
+             {u'parent_team__reference': u'1', 
+              u'user__id': u'testuser', u'team__id': u'test:t', 
+              u'reference': u'1', u'team__name': u'te', 
+              u'company__reference': u'1', 
+              u'user__reference': u'1', 
+              u'user__first_name': u'Test', 
+              u'user__last_name': u'Development', 
+              u'parent_team__id': u'testdev', 
+              u'team__reference': u'1', u'role': u'manager', 
+              u'affiliation_status': u'none', u'engagement__reference': u'', 
+              u'parent_team__name': u'TestDev', u'has_team_room_access': u'1', 
+              u'company__name': u'Test Dev', 
+              u'permissions': 
+                {u'permission': [u'manage_employment', u'manage_recruiting']}}}
+
+engagement = {u'status': u'active', 
+              u'buyer_team__reference': u'1', u'provider__reference': u'2', 
+              u'job__title': u'development', u'roles': {u'role': u'buyer'}, 
+              u'reference': u'1', u'engagement_end_date': u'', 
+              u'fixed_price_upfront_payment': u'0',
+              u'fixed_pay_amount_agreed': u'1.00', 
+              u'provider__id': u'test_provider', 
+              u'buyer_team__id': u'testteam:aa', 
+              u'engagement_job_type': u'fixed-price', 
+              u'job__reference': u'1', u'provider_team__reference': u'', 
+              u'engagement_title': u'Developer', 
+              u'fixed_charge_amount_agreed': u'0.01', 
+              u'created_time': u'0000', u'provider_team__id': u'', 
+              u'offer__reference': u'', 
+              u'engagement_start_date': u'000', u'description': u''}
+
+engagements = {u'lister': 
+               {u'total_items': u'10', u'query': u'', 
+                u'paging': {u'count': u'10', u'offset': u'0'}, u'sort': u''},
+               u'engagement': [engagement, engagement],
+               }           
+
+offer = {u'provider__reference': u'1', 
+         u'signed_by_buyer_user': u'', 
+         u'reference': u'1', u'job__description': u'python', 
+         u'buyer_company__name': u'Python community', 
+         u'engagement_title': u'developer', u'created_time': u'000', 
+         u'buyer_company__reference': u'2', u'buyer_team__id': u'testteam:aa', 
+         u'interview_status': u'in_process', u'buyer_team__reference': u'1', 
+         u'signed_time_buyer': u'', u'has_buyer_signed': u'', 
+         u'signed_time_provider': u'', u'created_by': u'testuser', 
+         u'job__reference': u'2', u'engagement_start_date': u'00000', 
+         u'fixed_charge_amount_agreed': u'0.01', u'provider_team__id': u'', 
+         u'status': u'', u'signed_by_provider_user': u'', 
+         u'engagement_job_type': u'fixed-price', u'description': u'', 
+         u'provider_team__name': u'', u'fixed_pay_amount_agreed': u'0.01', 
+         u'candidacy_status': u'active', u'has_provider_signed': u'', 
+         u'message_from_provider': u'', u'my_role': u'buyer', 
+         u'key': u'~~0001', u'message_from_buyer': u'', 
+         u'buyer_team__name': u'Python community 2', 
+         u'engagement_end_date': u'', u'fixed_price_upfront_payment': u'0', 
+         u'created_type': u'buyer', u'provider_team__reference': u'', 
+         u'job__title': u'translation', u'expiration_date': u'', 
+         u'engagement__reference': u''}
+
+offers = {u'lister': 
+          {u'total_items': u'10', u'query': u'', u'paging': 
+           {u'count': u'10', u'offset': u'0'}, u'sort': u''}, 
+           u'offer': [offer, offer]}
+
+job = {u'subcategory': u'Development', u'reference': u'1', 
+       u'buyer_company__name': u'Python community', 
+       u'job_type': u'fixed-price', u'created_time': u'000', 
+       u'created_by': u'test', u'duration': u'', 
+       u'last_candidacy_access_time': u'', 
+       u'category': u'Web', 
+       u'buyer_team__reference': u'169108', u'title': u'translation', 
+       u'buyer_company__reference': u'1', u'num_active_candidates': u'0', 
+       u'buyer_team__name': u'Python community 2', u'start_date': u'000', 
+       u'status': u'filled', u'num_new_candidates': u'0', 
+       u'description': u'test', u'end_date': u'000', 
+       u'public_url': u'http://www.odesk.com/jobs/~~0001', 
+       u'visibility': u'invite-only', u'buyer_team__id': u'testteam:aa', 
+       u'num_candidates': u'1', u'budget': u'1000', u'cancelled_date': u'', 
+       u'filled_date': u'0000'}
+
+jobs = [job, job]
+
+task =  {u'reference': u'test', u'company_reference': u'1',
+          u'team__reference': u'1', u'user__reference': u'1',
+          u'code': u'1', u'description': u'test task',
+          u'url': u'http://url.odesk.com/task', u'level': u'1',} 
+tasks = [task, task]
+
+auth_user = {u'first_name': u'TestF', u'last_name': u'TestL', 
+             u'uid': u'testuser', u'timezone_offset': u'0', 
+             u'timezone': u'Europe/Athens', u'mail': u'test_user@odesk.com', 
+             u'messenger_id': u'', u'messenger_type': u'yahoo'} 
+
+user = {u'status': u'active', u'first_name': u'TestF', 
+        u'last_name': u'TestL', u'reference': u'0001', 
+        u'timezone_offset': u'10800', 
+        u'public_url': u'http://www.odesk.com/users/~~000', 
+        u'is_provider': u'1', 
+        u'timezone': u'GMT+02:00 Athens, Helsinki, Istanbul', 
+        u'id': u'testuser'}
+
+team = {u'status': u'active', u'parent_team__reference': u'0', 
+         u'name': u'Test', 
+         u'reference': u'1', 
+         u'company__reference': u'1', 
+         u'id': u'test', 
+         u'parent_team__id': u'test_parent', 
+         u'company_name': u'Test', u'is_hidden': u'', 
+         u'parent_team__name': u'Test parent'}
+
+company = {u'status': u'active',  
+             u'name': u'Test', 
+             u'reference': u'1', 
+             u'company_id': u'1',
+             u'owner_user_id': u'1', }
+                        
+hr_dict = {u'auth_user': auth_user,
+           u'server_time': u'0000', 
+           u'user': user,
+           u'team': team, 
+           u'company': company, 
+            u'teams': [team, team],
+            u'companies': [company, company],
+            u'users': [user, user],
+            u'tasks': task,
+            u'userroles': userroles,
+            u'engagements': engagements,
+            u'engagement': engagement,
+            u'offer': offer,
+            u'offers': offers,   
+            u'job': job,
+            u'jobs': jobs,}
 
 def return_hr_json():
     return json.dumps(hr_dict)
@@ -512,7 +557,13 @@ def test_get_hrv2():
     assert hr.get_company_users(1) == hr_dict['users'], hr.get_company_users(1)
 
     #test get_company_tasks
-    assert hr.get_company_tasks(1) == hr_dict['tasks'], hr.get_company_tasks(1)
+    try:
+        assert hr.get_company_tasks(1) == hr_dict['tasks'],\
+            hr.get_company_tasks(1)
+    except APINotImplementedException, e:
+        pass
+    except:
+        assert 0, "APINotImplementedException not raised"
      
     #test get_teams
     assert hr.get_teams() == hr_dict[u'teams'], hr.get_teams()
@@ -524,8 +575,13 @@ def test_get_hrv2():
     assert hr.get_team_users(1) == hr_dict[u'users'], hr.get_team_users(1)
     
     #test get_team_tasks
-    assert hr.get_team_tasks(1) == hr_dict['tasks'], hr.get_team_tasks(1)
-    
+    try:
+        assert hr.get_team_tasks(1) == hr_dict['tasks'], hr.get_team_tasks(1)
+    except APINotImplementedException, e:
+        pass
+    except:
+        assert 0, "APINotImplementedException not raised"
+     
     #test get_user_role
     assert hr.get_user_role(user_id=1) == hr_dict['userroles'],\
                                                  hr.get_user_role(user_id=1)
@@ -548,3 +604,24 @@ def test_get_hrv2():
         pass
     except:
         assert 0, "Both params passed, but exception not raised"
+        
+    try:
+        assert hr.get_tasks() == hr_dict['tasks'], hr.get_tasks()
+    except APINotImplementedException, e:
+        pass
+    except:
+        assert 0, "APINotImplementedException not raised"      
+        
+        
+    #test get_jobs
+    assert hr.get_jobs() == hr_dict[u'jobs'], hr.get_jobs()
+    assert hr.get_job(1) == hr_dict[u'job'], hr.get_job(1)
+    
+    #test get_offers
+    assert hr.get_offers() == hr_dict[u'offers'], hr.get_offers()
+    assert hr.get_offer(1) == hr_dict[u'offer'], hr.get_offer(1)
+ 
+    #test get_engagements
+    assert hr.get_engagements() == hr_dict[u'engagements'], hr.get_engagements()
+    assert hr.get_engagement(1) == hr_dict[u'engagement'], hr.get_engagement(1)
+       
