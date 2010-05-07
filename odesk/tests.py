@@ -631,4 +631,58 @@ def test_hrv2_post_adjustment():
     result = hr.post_team_adjustment(1, 2, 100000, 'test', 'test note')
     assert result == adjustments[u'adjustment'], result
     
+provider_dict = {'profile': 
+                 {u'response_time': u'31.0000000000000000', 
+                  u'dev_agency_ref': u'', 
+                  u'dev_adj_score_recent': u'0', 
+                  u'dev_ui_profile_access': u'Public', 
+                  u'dev_portrait': u'', 
+                  u'dev_ic': u'Freelance Provider', 
+                  u'certification': u'', 
+                  u'dev_usr_score': u'0', 
+                  u'dev_country': u'Ukraine', 
+                  u'dev_recent_rank_percentile': u'0', 
+                  u'dev_profile_title': u'Python developer', 
+                  u'dev_groups': u'', 
+                  u'dev_scores': 
+                  {u'dev_score': 
+                   [{u'description': u'competency and skills for the job, understanding of specifications/instructions', 
+                     u'avg_category_score_recent': u'', 
+                     u'avg_category_score': u'', 
+                     u'order': u'1', u'label': u'Skills'}, 
+                     {u'description': u'quality of work deliverables', 
+                      u'avg_category_score_recent': u'', 
+                      u'avg_category_score': u'', u'order': u'2', u'label': u'Quality'},
+                      ] 
+                   }}}
+         
+         
+def return_provider_json():
+    return json.dumps(provider_dict)
+
+def patched_urlopen_provider(request, *args, **kwargs):
+    request.read = return_provider_json
+    return request
+
+@patch('urllib2.urlopen', patched_urlopen_provider)  
+def test_provider():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+    
+    pr = c.provider
+    
+    #test full_url
+    full_url = pr.full_url('test')
+    assert full_url == 'https://www.odesk.com/api/profiles/v1/test', full_url
+    
+    #test get_provider
+    assert pr.get_provider(1) == provider_dict['profile'], pr.get_provider(1)
+    
+    #test get_provider_brief
+    assert pr.get_provider_brief(1) == provider_dict['profile'],\
+        pr.get_provider_brief(1)
+    
        
