@@ -163,6 +163,7 @@ class Client(BaseClient):
         self.auth = Auth(self)
         self.team = Team(self)
         self.hr = HR2(self)
+        self.provider = Provider(self)
 
     #Shortcuts for HTTP methods
     def get(self, url, data={}):
@@ -398,6 +399,22 @@ class HR2(Namespace):
         url = 'engagements/%s' % str(engagement_id)
         result = self.get(url)
         return result['engagement']  
+    
+class Provider(Namespace):
+    api_url = 'profiles/'
+    version = 1
+    
+    def get_provider(self, provider_ciphertext):
+        url = 'providers/~~%s' % str(provider_ciphertext)
+        result = self.get(url)
+        return result['profile']
+    
+    def get_provider_brief(self, provider_ciphertext):
+        url = 'providers/~~%s/brief' % str(provider_ciphertext)
+        result = self.get(url)
+        return result['profile']    
+
+
     
 if __name__ == "__main__":
     import doctest
