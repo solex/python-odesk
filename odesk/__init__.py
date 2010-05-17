@@ -260,7 +260,11 @@ class Team(Namespace):
     def get_teamrooms(self):
         url = 'teamrooms'
         result = self.get(url)
-        return result['teamrooms']['teamroom']
+        #arent we return only 1 team here?
+        teamrooms = result['teamrooms']['teamroom']
+        if not isinstance(teamrooms, list):
+            teamrooms = [teamrooms]
+        return teamrooms
 
     def get_snapshots(self, team_id, online='now'):
         url = 'teamrooms/%s' % team_id
