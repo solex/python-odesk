@@ -164,6 +164,7 @@ class Client(BaseClient):
         self.team = Team(self)
         self.hr = HR2(self)
         self.provider = Provider(self)
+        self.search_providers = SearchProvider(self)
 
     #Shortcuts for HTTP methods
     def get(self, url, data={}):
@@ -260,7 +261,7 @@ class Team(Namespace):
     def get_teamrooms(self):
         url = 'teamrooms'
         result = self.get(url)
-        #arent we return only 1 team here?
+        #aren't we return only 1 team here?
         teamrooms = result['teamrooms']['teamroom']
         if not isinstance(teamrooms, list):
             teamrooms = [teamrooms]
@@ -340,7 +341,8 @@ class HR2(Namespace):
         result = self.get(url, data)
         return result['users']  
     
-    def post_team_adjustment(self, team_id, engagement_id, amount, comments, notes):
+    def post_team_adjustment(self, team_id, engagement_id, amount, comments, 
+                             notes):
         '''
         Add bonus to engagement
         '''
@@ -409,17 +411,25 @@ class Provider(Namespace):
     version = 1
     
     def get_provider(self, provider_ciphertext):
-        url = 'providers/~~%s' % str(provider_ciphertext)
+        url = 'providers/%s' % str(provider_ciphertext)
         result = self.get(url)
         return result['profile']
     
     def get_provider_brief(self, provider_ciphertext):
-        url = 'providers/~~%s/brief' % str(provider_ciphertext)
+        url = 'providers/%s/brief' % str(provider_ciphertext)
         result = self.get(url)
         return result['profile']    
 
-
+class SearchProvider(Namespace):
+    api_url = 'profiles/'
+    version = 1
     
+    def get_providers(self, q=''):
+        url = 'search/providers'
+        result = self.get(url, data=q)
+        return result['providers']
+    
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
