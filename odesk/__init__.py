@@ -261,7 +261,6 @@ class Team(Namespace):
     def get_teamrooms(self):
         url = 'teamrooms'
         result = self.get(url)
-        #aren't we return only 1 team here?
         teamrooms = result['teamrooms']['teamroom']
         if not isinstance(teamrooms, list):
             teamrooms = [teamrooms]
@@ -274,6 +273,16 @@ class Team(Namespace):
         if not isinstance(snapshots, list):
             snapshots = [snapshots]
         return snapshots
+    
+    def get_workdiaries(self, team_id, username, date=None):
+        url = 'workdiaries/%s/%s' % (str(team_id), str(username))
+        if date:
+            url += '/%s' %str(date)
+        result = self.get(url)
+        snapshots = result['snapshots']['snapshot']
+        if not isinstance(snapshots, list):
+            snapshots = [snapshots]        
+        return result['snapshots']['user'], snapshots
 
 
 class HR2(Namespace):
