@@ -125,7 +125,6 @@ class BaseClient(object):
         """
         assert format == 'json', "Only JSON format is supported at the moment"
         url += '.' + format
-        print url
         try:
             response = self.urlopen(url, data, method)
         except urllib2.HTTPError, e:
@@ -444,26 +443,43 @@ class Messages(Namespace):
     api_url = 'mc/'
     version = 1
     
-    def get_trays(self, username=None):
+    def get_trays(self, username=None, paging_offset=0, paging_count=20):
         """
-        Actually API respond 403 Forbidden to call without username, while web responding ok
-        TODO: paging
+        Actually API respond 403 Forbidden to call without username, 
+        while web responding ok, see 
+        http://www.odesk.com/community/node/11422
         """
         url = 'trays'
+        if paging_offset or not paging_count == 20:
+            data = {'paging': '%s;%s' %(str(paging_offset), str(paging_count))}
+        else:
+            data = {}
+            
         if username:
             url += '/%s' % str(username)
-        result = self.get(url)
+        result = self.get(url, data=data)
         return result["trays"]
     
-    def get_tray_content(self, username, tray):
-        """TODO: Paging"""
+    def get_tray_content(self, username, tray, paging_offset=0, 
+                         paging_count=20):
         url = 'trays/%s/%s' % (str(username), str(tray))
-        result = self.get(url)
+        if paging_offset or not paging_count == 20:
+            data = {'paging': '%s;%s' %(str(paging_offset), str(paging_count))}
+        else:
+            data = {}
+                    
+        result = self.get(url, data=data)
         return result["current_tray"]["threads"]
     
-    def get_thread_content(self, username, thread_id):    
+    def get_thread_content(self, username, thread_id, paging_offset=0, 
+                           paging_count=20):    
         url = 'threads/%s/%s' % (str(username), (thread_id))
-        result = self.get(url)
+        if paging_offset or not paging_count == 20:
+            data = {'paging': '%s;%s' %(str(paging_offset), str(paging_count))}
+        else:
+            data = {}
+                    
+        result = self.get(url, data=data)
         return result["thread"]
     
     def _generate_many_threads_url(self, url, threads_ids):
