@@ -381,7 +381,7 @@ def test_team():
     assert full_url == 'https://www.odesk.com/api/team/v1/test', full_url
     
     #test get_teamrooms
-    assert te.get_teamrooms() == teamrooms_dict['teamrooms']['teamroom'],\
+    assert te.get_teamrooms() == [teamrooms_dict['teamrooms']['teamroom']],\
          te.get_teamrooms()
 
     #test get_snapshots
@@ -685,4 +685,164 @@ def test_provider():
     assert pr.get_provider_brief(1) == provider_dict['profile'],\
         pr.get_provider_brief(1)
     
-       
+trays_dict = {'trays': [{u'unread': u'0', 
+              u'type': u'sent', 
+              u'id': u'1', 
+              u'tray_api': u'/api/mc/v1/trays/username/sent.json'}, 
+              {u'unread': u'0', 
+               u'type': u'inbox', 
+               u'id': u'2', 
+               u'tray_api': u'/api/mc/v1/trays/username/inbox.json'}, 
+              {u'unread': u'0', 
+               u'type': u'notifications', 
+               u'id': u'3', 
+               u'tray_api': u'/api/mc/v1/trays/username/notifications.json'},]} 
+    
+def return_trays_json():
+    return json.dumps(trays_dict)
+
+def patched_urlopen_trays(request, *args, **kwargs):
+    request.read = return_trays_json
+    return request    
+
+@patch('urllib2.urlopen', patched_urlopen_trays)  
+def test_get_trays():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    mc = c.mc
+    
+    #test full_url
+    full_url = mc.full_url('test')
+    assert full_url == 'https://www.odesk.com/api/mc/v1/test', full_url
+    
+    #test get_trays
+    assert mc.get_trays(1) == trays_dict['trays'], mc.get_trays(1)
+
+tray_content_dict = {"current_tray": {
+                                      "threads": '1'}}
+
+def return_tray_content_json():
+    return json.dumps(tray_content_dict)
+
+def patched_urlopen_tray_content(request, *args, **kwargs):
+    request.read = return_tray_content_json
+    return request  
+    
+@patch('urllib2.urlopen', patched_urlopen_tray_content)  
+def test_get_tray_content():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    mc = c.mc
+    
+    #test get_provider
+    assert mc.get_tray_content(1, 1) ==\
+         tray_content_dict['current_tray']['threads'], mc.get_tray_content(1, 1)
+     
+thread_content_dict = {"thread": {"test": '1'}}
+
+def return_thread_content_json():
+    return json.dumps(thread_content_dict)
+
+def patched_urlopen_thread_content(request, *args, **kwargs):
+    request.read = return_thread_content_json
+    return request  
+    
+@patch('urllib2.urlopen', patched_urlopen_thread_content)     
+def test_get_thread_content():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    mc = c.mc
+    
+    #test get_provider
+    assert mc.get_thread_content(1, 1) ==\
+         thread_content_dict['thread'], mc.get_thread_content(1, 1)
+    
+read_thread_content_dict = {"thread": {"test": '1'}}
+
+def return_read_thread_content_json():
+    return json.dumps(read_thread_content_dict)
+
+def patched_urlopen_read_thread_content(request, *args, **kwargs):
+    request.read = return_read_thread_content_json
+    return request  
+    
+@patch('urllib2.urlopen', patched_urlopen_read_thread_content)      
+def test_put_threads_read_unread():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    mc = c.mc
+    
+    read = mc.put_threads_read('test', [1,2,3])
+    assert read == read_thread_content_dict, read
+    
+    unread = mc.put_threads_read('test', [5,6,7])
+    assert unread == read_thread_content_dict, unread
+    
+@patch('urllib2.urlopen', patched_urlopen_read_thread_content)       
+def test_put_threads_starred_unstarred():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    mc = c.mc
+    
+    starred = mc.put_threads_starred('test', [1,2,3])
+    assert starred == read_thread_content_dict, starred
+    
+    unstarred = mc.put_threads_unstarred('test', [5,6,7]) 
+    assert unstarred == read_thread_content_dict, unstarred   
+
+  
+@patch('urllib2.urlopen', patched_urlopen_read_thread_content)       
+def test_put_threads_deleted_undeleted():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    mc = c.mc
+    
+    deleted = mc.put_threads_deleted('test', [1,2,3])
+    assert deleted == read_thread_content_dict, deleted 
+    
+    undeleted = mc.put_threads_undeleted('test', [5,6,7])    
+    assert undeleted == read_thread_content_dict, undeleted
+     
+@patch('urllib2.urlopen', patched_urlopen_read_thread_content)       
+def test_post_message():                                                
+   
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    mc = c.mc       
+    
+    message = mc.post_message('username', 'recepient1,recepient2', 'subject', 
+                              'body')
+    assert message == read_thread_content_dict, message
+
+    reply = mc.post_message('username', 'recepient1,recepient2', 'subject', 
+                              'body', 123)
+    assert reply == read_thread_content_dict, reply
+                                           

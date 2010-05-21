@@ -1,10 +1,9 @@
 """
 Python bindings to odesk API
-python-odesk version 0.0.1 alpha
-(C) 2010 odesk
+python-odesk version 0.0.3 alpha
+(C) 2010 oDesk
 """
-
-VERSION = (0, 0, 2, 'alpha', 1)
+VERSION = (0, 0, 3, 'alpha', 2)
 
 def get_version():
     version = '%s.%s' % (VERSION[0], VERSION[1])
@@ -126,6 +125,7 @@ class BaseClient(object):
         """
         assert format == 'json', "Only JSON format is supported at the moment"
         url += '.' + format
+        print url
         try:
             response = self.urlopen(url, data, method)
         except urllib2.HTTPError, e:
@@ -165,6 +165,7 @@ class Client(BaseClient):
         self.hr = HR2(self)
         self.provider = Provider(self)
         self.search_providers = SearchProvider(self)
+        self.mc = Messages(self)
 
     #Shortcuts for HTTP methods
     def get(self, url, data={}):
@@ -281,7 +282,8 @@ class Team(Namespace):
         result = self.get(url)
         snapshots = result['snapshots']['snapshot']
         if not isinstance(snapshots, list):
-            snapshots = [snapshots]        
+            snapshots = [snapshots]       
+        #not sure we need to return user 
         return result['snapshots']['user'], snapshots
 
 
@@ -438,7 +440,111 @@ class SearchProvider(Namespace):
         result = self.get(url, data=q)
         return result['providers']
     
+class Messages(Namespace):
+    api_url = 'mc/'
+    version = 1
+    
+    def get_trays(self, username=None):
+        """
+        Actually API respond 403 Forbidden to call without username, while web responding ok
+        TODO: paging
+        """
+        url = 'trays'
+        if username:
+            url += '/%s' % str(username)
+        result = self.get(url)
+        return result["trays"]
+    
+    def get_tray_content(self, username, tray):
+        """TODO: Paging"""
+        url = 'trays/%s/%s' % (str(username), str(tray))
+        result = self.get(url)
+        return result["current_tray"]["threads"]
+    
+    def get_thread_content(self, username, thread_id):    
+        url = 'threads/%s/%s' % (str(username), (thread_id))
+        result = self.get(url)
+        return result["thread"]
+    
+    def _generate_many_threads_url(self, url, threads_ids):
+        new_url = url
+        for counter, thread_id in enumerate(threads_ids):
+            if counter == 0:
+                new_url += '%s' % str(thread_id)
+            else:
+                new_url += ';%s' % str(thread_id)
+        return new_url
+            
+    def put_threads_read_unread(self, username, thread_ids, read=True):
+        """thread_ids must be a list, even of 1 item"""
+        url = 'threads/%s/' % str(username)
+        if read:
+            data={'read': 'true'}
+        else:
+            data={'read': 'false'}
+        result = self.put(self._generate_many_threads_url(url, thread_ids), 
+                          data=data)
+        return result
+    
+    def put_threads_read(self, username, thread_ids):
+        return self.put_threads_read_unread(username, thread_ids, read=True)
 
+    def put_threads_unread(self, username, thread_ids):
+        return self.put_threads_read_unread(username, thread_ids, read=False)    
+    
+    def put_threads_starred_or_unstarred(self, username, thread_ids, 
+                                         starred=True):
+        """thread_ids must be a list, even of 1 item"""
+        url = 'threads/%s/' % str(username)
+
+        if starred:
+            data={'starred': 'true'}
+        else:
+            data={'starred': 'false'}
+                    
+        result = self.put(self._generate_many_threads_url(url, thread_ids), 
+                          data=data)
+        return result 
+
+    def put_threads_starred(self, username, thread_ids):
+        return self.put_threads_starred_or_unstarred(username, 
+                                                thread_ids, starred=True)
+        
+    def put_threads_unstarred(self, username, thread_ids):
+        return self.put_threads_starred_or_unstarred(username, 
+                                                thread_ids, starred=False)        
+            
+    def put_threads_deleted_or_undeleted(self, username, thread_ids, 
+                                         deleted=True):
+        """thread_ids must be a list, even of 1 item"""
+        url = 'threads/%s/' % str(username)
+
+        if deleted:
+            data={'deleted': 'true'}
+        else:
+            data={'deleted': 'false'}
+                    
+        result = self.put(self._generate_many_threads_url(url, thread_ids), 
+                          data=data)
+        return result   
+    
+    def put_threads_deleted(self, username, thread_ids):
+        return self.put_threads_deleted_or_undeleted(username, thread_ids,
+                                                     deleted=True)  
+        
+    def put_threads_undeleted(self, username, thread_ids):
+        return self.put_threads_deleted_or_undeleted(username, thread_ids,
+                                                     deleted=False)        
+        
+    def post_message(self, username, recipients, subject, body, thread_id=None):
+        url = 'threads/%s' % str(username)
+        if thread_id:
+            url += '/%s' % str(thread_id)
+        result = self.post(url, data={'recipients': recipients,
+                                      'subject': subject,
+                                      'body': body})
+        return result
+        
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
