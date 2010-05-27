@@ -165,6 +165,7 @@ class Client(BaseClient):
         self.provider = Provider(self)
         self.search_providers = SearchProvider(self)
         self.mc = Messages(self)
+        self.time_reports = TimeReports(self)
 
     #Shortcuts for HTTP methods
     def get(self, url, data={}):
@@ -560,7 +561,95 @@ class Messages(Namespace):
                                       'subject': subject,
                                       'body': body})
         return result
+    
+class GdsNamespace(Namespace):
+    base_url = 'https://www.odesk.com/gds/'  
+
+    def urlopen(self, url, data={}, method='GET'):
+        data = data.copy()
+        query = self.client.urlencode(data)
+        if method == 'GET':
+            url += '?' + query
+            print url
+            request = HttpRequest(url=url, data=None, method=method)
+            return urllib2.urlopen(request)
+        return None
         
+    def read(self, url, data={}, method='GET'):
+        """
+        Returns parsed Python object or raises an error
+        """
+        try:
+            response = self.urlopen(url, data, method)
+        except urllib2.HTTPError, e:
+            if e.code == 400:
+                raise HTTP400BadRequestError(e.filename, e.code, e.msg, 
+                                             e.hdrs, None)
+            elif e.code == 401:
+                raise HTTP401UnauthorizedError(e.filename, e.code, e.msg, 
+                                               e.hdrs, None)
+            elif e.code == 403:
+                raise HTTP403ForbiddenError(e.filename, e.code, e.msg, 
+                                            e.hdrs, None)
+            elif e.code == 404:
+                raise HTTP404NotFoundError(e.filename, e.code, e.msg, 
+                                           e.hdrs, None)
+            else:
+                raise e
+        
+        result = json.loads(response.read()) 
+        return result    
+   
+    def get(self, url, data={}):
+        return self.read(self.full_url(url), data, method='GET')
+       
+         
+class TimeReports(GdsNamespace): 
+    api_url = 'timereports/'
+    version = 1
+    
+    def _build_tq_param(self, selects, wheres):
+        tq = "SELECT "
+        for counter, param in enumerate(selects):
+            if counter == 0:
+                tq += param
+            else:
+                tq += ', '+param
+        if wheres:
+            tq += ' WHERE '
+            
+        for where in wheres:
+            tq += where+' '
+        return tq
+    
+    def get_provider_report(self, provider_id, selects, wheres, hours=False):
+        '''get provider's specific time report'''
+        url = 'providers/%s' % str(provider_id)
+        if hours:
+            url += '/hours'
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result   
+
+    def get_company_report(self, company_id, selects, wheres, hours=False):
+        '''get company's specific time report'''
+        url = 'companies/%s' % str(company_id)
+        if hours:
+            url += '/hours'
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result    
+ 
+    def get_agency_report(self, company_id, agency_id, selects, wheres, 
+                          hours=False):
+        '''get agency's specific time report'''
+        url = 'companies/%s/agencies/%s' % (str(company_id), str(agency_id))
+        if hours:
+            url += '/hours'
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+             
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

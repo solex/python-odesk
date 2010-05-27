@@ -845,4 +845,45 @@ def test_post_message():
     reply = mc.post_message('username', 'recepient1,recepient2', 'subject', 
                               'body', 123)
     assert reply == read_thread_content_dict, reply
+    
+    
+time_report_dict = {u'table': 
+     {u'rows': 
+      [{u'c': 
+        [{u'v': u'20100513'}, 
+         {u'v': u'odesk:odeskps'}, 
+         {u'v': u'1'}, 
+         {u'v': u'1'}, 
+         {u'v': u'0'}, 
+         {u'v': u'1'}, 
+         {u'v': u'Bug 1: Test'}]}], 
+         u'cols': 
+         [{u'type': u'date', u'label': u'worked_on'}, 
+          {u'type': u'string', u'label': u'assignment_team_id'}, 
+          {u'type': u'number', u'label': u'hours'}, 
+          {u'type': u'number', u'label': u'earnings'}, 
+          {u'type': u'number', u'label': u'earnings_offline'}, 
+          {u'type': u'string', u'label': u'task'}, 
+          {u'type': u'string', u'label': u'memo'}]}}    
+
+def return_read_time_report_json(*args, **kwargs):
+    return json.dumps(time_report_dict)
+
+def patched_urlopen_time_report_content(request, *args, **kwargs):
+    request.read = return_read_time_report_json
+    return request  
+    
+@patch('urllib2.urlopen', patched_urlopen_time_report_content)      
+def test_get_time_report():
+    public_key = 'public'
+    secret_key = 'secret'
+    api_token = 'some_token'
+    c = Client(public_key, secret_key, api_token)
+    test_url = "http://test.url"
+
+    tc = c.time_reports
+    
+    read = tc.get_provider_report('test', ['1','2','3'], ['3','4','5'])
+    assert read == time_report_dict, read
+
                                            

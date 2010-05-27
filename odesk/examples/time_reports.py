@@ -9,7 +9,7 @@ SECRET_KEY = '3fa4d68bbde53c83'
 
 #TODO: Desktop app example (check if it's working at all - wasn't last time)
 
-def simple_messager(public_key, secret_key):
+def time_reports(public_key, secret_key):
     print "Emulating web-based app"
     #Instantiating a client without an auth token
     client = odesk.Client(public_key, secret_key)
@@ -26,17 +26,24 @@ def simple_messager(public_key, secret_key):
     #typical for web apps, which wouldn't probably keep client instances 
     #between requests
     client = odesk.Client(public_key, secret_key, auth_token)
-    print client.mc.get_trays()
-    #print client.mc.get_tray_content('username', 'inbox')
-    #print client.mc.get_thread_content('username', '00')
-    print client.mc.post_message('username', 'username2', 'test from api', 'test body')
+    print client.time_reports.get_provider_report('user1', ['worked_on', 
+            'assignment_team_id', 'hours', 'earnings', 'earnings_offline', 
+            'task', 'memo'],
+            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"])
+ 
+    print client.time_reports.get_provider_report('user2', ['worked_on', 
+            'assignment_team_id', 'hours', 'task', 'memo'],
+            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"],
+            hours=True)    
 
-
-
-
+    print client.time_reports.get_agency_report('company1', 'agency1', ['worked_on', 
+            'assignment_team_id', 'hours', 'earnings', 'earnings_offline', 
+            'task', 'memo'],
+            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"])
+ 
 if __name__ == '__main__':
     public_key = PUBLIC_KEY or raw_input('Enter public key: ')
     secret_key = SECRET_KEY or raw_input('Enter secret key: ')
 
-    simple_messager(public_key, secret_key)
+    time_reports(public_key, secret_key)
 
