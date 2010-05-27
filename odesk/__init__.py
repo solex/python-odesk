@@ -570,7 +570,6 @@ class GdsNamespace(Namespace):
         query = self.client.urlencode(data)
         if method == 'GET':
             url += '?' + query
-            print url
             request = HttpRequest(url=url, data=None, method=method)
             return urllib2.urlopen(request)
         return None
