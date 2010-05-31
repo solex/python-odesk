@@ -61,6 +61,22 @@ def signed_urlencode(secret, query={}):
     query['api_sig'] = hashlib.md5(message).hexdigest()
     return urllib.urlencode(query)
 
+def raise_http_error(e):
+    '''Raise custom exception'''
+    if e.code == 400:
+        raise HTTP400BadRequestError(e.filename, e.code, e.msg, 
+                                     e.hdrs, None)
+    elif e.code == 401:
+        raise HTTP401UnauthorizedError(e.filename, e.code, e.msg, 
+                                       e.hdrs, None)
+    elif e.code == 403:
+        raise HTTP403ForbiddenError(e.filename, e.code, e.msg, 
+                                    e.hdrs, None)
+    elif e.code == 404:
+        raise HTTP404NotFoundError(e.filename, e.code, e.msg, 
+                                   e.hdrs, None)
+    else:
+        raise e    
 
 class HttpRequest(urllib2.Request):
     """
@@ -128,20 +144,8 @@ class BaseClient(object):
         try:
             response = self.urlopen(url, data, method)
         except urllib2.HTTPError, e:
-            if e.code == 400:
-                raise HTTP400BadRequestError(e.filename, e.code, e.msg, 
-                                             e.hdrs, None)
-            elif e.code == 401:
-                raise HTTP401UnauthorizedError(e.filename, e.code, e.msg, 
-                                               e.hdrs, None)
-            elif e.code == 403:
-                raise HTTP403ForbiddenError(e.filename, e.code, e.msg, 
-                                            e.hdrs, None)
-            elif e.code == 404:
-                raise HTTP404NotFoundError(e.filename, e.code, e.msg, 
-                                           e.hdrs, None)
-            else:
-                raise e
+            raise_http_error(e)
+            
         if format == 'json':
             result = json.loads(response.read()) 
         return result
@@ -445,11 +449,6 @@ class Messages(Namespace):
     version = 1
     
     def get_trays(self, username=None, paging_offset=0, paging_count=20):
-        """
-        Actually API respond 403 Forbidden to call without username, 
-        while web responding ok, see 
-        http://www.odesk.com/community/node/11422
-        """
         url = 'trays'
         if paging_offset or not paging_count == 20:
             data = {'paging': '%s;%s' %(str(paging_offset), str(paging_count))}
@@ -581,27 +580,37 @@ class GdsNamespace(Namespace):
         try:
             response = self.urlopen(url, data, method)
         except urllib2.HTTPError, e:
-            if e.code == 400:
-                raise HTTP400BadRequestError(e.filename, e.code, e.msg, 
-                                             e.hdrs, None)
-            elif e.code == 401:
-                raise HTTP401UnauthorizedError(e.filename, e.code, e.msg, 
-                                               e.hdrs, None)
-            elif e.code == 403:
-                raise HTTP403ForbiddenError(e.filename, e.code, e.msg, 
-                                            e.hdrs, None)
-            elif e.code == 404:
-                raise HTTP404NotFoundError(e.filename, e.code, e.msg, 
-                                           e.hdrs, None)
-            else:
-                raise e
+            raise_http_error(e)
         
         result = json.loads(response.read()) 
         return result    
    
     def get(self, url, data={}):
         return self.read(self.full_url(url), data, method='GET')
-       
+  
+class GdsQ(object):
+    # Connection types
+    AND = 'AND'
+    OR = 'OR'
+    default = AND
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def _combine(self, other, conn):
+        if not isinstance(other, Q):
+            raise TypeError(other)
+        obj = type(self)()
+        obj.add(self, conn)
+        obj.add(other, conn)
+        return obj
+
+    def __or__(self, other):
+        return self._combine(other, self.OR)
+
+    def __and__(self, other):
+        return self._combine(other, self.AND)
+      
          
 class TimeReports(GdsNamespace): 
     api_url = 'timereports/'
