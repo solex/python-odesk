@@ -170,6 +170,7 @@ class Client(BaseClient):
         self.search_providers = SearchProvider(self)
         self.mc = Messages(self)
         self.time_reports = TimeReports(self)
+        self.otask = OTask(self)
 
     #Shortcuts for HTTP methods
     def get(self, url, data={}):
@@ -561,6 +562,162 @@ class Messages(Namespace):
                                       'body': body})
         return result
     
+class OTask(Namespace):
+    api_url = 'otask/'
+    version = 1
+    
+
+    def get_company_tasks(self, company_id):
+        url = 'tasks/companies/%s/tasks' % str(company_id)
+        result = self.get(url)
+        return result["tasks"]
+    
+    def get_team_tasks(self, company_id, team_id):
+        url = 'tasks/companies/%s/teams/%s/tasks' % (str(company_id), str(team_id))
+        result = self.get(url)
+        return result["tasks"]
+    
+    def get_user_tasks(self, company_id, team_id, user_id):
+        url = 'tasks/companies/%s/teams/%s/users/%s/tasks' % (str(company_id), 
+                                                     str(team_id), str(user_id))
+        result = self.get(url)
+        return result["tasks"]
+    
+
+    def get_company_tasks_full(self, company_id):
+        url = 'tasks/companies/%s/tasks/full_list' % str(company_id)
+        result = self.get(url)
+        return result["tasks"]
+    
+    def get_team_tasks_full(self, company_id, team_id):
+        url = 'tasks/companies/%s/teams/%s/tasks/full_list' %\
+                                             (str(company_id), str(team_id))
+        result = self.get(url)
+        return result["tasks"]
+    
+    def get_user_tasks_full(self, company_id, team_id, user_id):
+        url = 'tasks/companies/%s/teams/%s/users/%s/tasks/full_list' %\
+                                (str(company_id), str(team_id), str(user_id))
+        result = self.get(url)
+        return result["tasks"]    
+
+    def _generate_many_tasks_url(self, url, task_codes):
+        new_url = url
+        for counter, task_code in enumerate(task_codes):
+            if counter == 0:
+                new_url += '%s' % str(task_code)
+            else:
+                new_url += ';%s' % str(task_code)
+        return new_url
+
+    def get_company_specific_tasks(self, company_id, task_codes):
+        url = 'tasks/companies/%s/tasks/%s' % (str(company_id), 
+                                        _generate_many_tasks_url(task_codes))
+        result = self.get(url)
+        return result["tasks"]
+    
+    def get_team_specific_tasks(self, company_id, team_id, task_codes):
+        url = 'tasks/companies/%s/teams/%s/tasks/%s' %\
+                                             (str(company_id), str(team_id),
+                                         _generate_many_tasks_url(task_codes))
+        result = self.get(url)
+        return result["tasks"]
+    
+    def get_user_specific_tasks(self, company_id, team_id, user_id, task_codes):
+        url = 'tasks/companies/%s/teams/%s/users/%s/tasks/%s' %\
+                                (str(company_id), str(team_id), str(user_id),
+                                 _generate_many_tasks_url(task_codes))
+        result = self.get(url)
+        return result["tasks"]  
+
+    def post_company_task(self, company_id, code, description, url):
+        url = 'tasks/companies/%s/tasks' % str(company_id)
+        data = {'code': code,
+                'description': description,
+                'url': url}
+        result = self.post(url, data)
+        return result
+
+    def post_team_task(self, company_id, team_id, code, description, url):
+        url = 'tasks/companies/%s/teams/%s/tasks' % (str(company_id), 
+                                                     str(team_id))
+        data = {'code': code,
+                'description': description,
+                'url': url}
+        result = self.post(url, data)
+        return result
+
+    def post_user_task(self, company_id, team_id, user_id, code, description, url):
+        url = 'tasks/companies/%s/teams/%s/users/%s/tasks' % (str(company_id), 
+                                                     str(team_id), str(user_id))
+        data = {'code': code,
+                'description': description,
+                'url': url}
+        result = self.post(url, data)
+        return result
+
+    def put_company_task(self, company_id, code, description, url):
+        url = 'tasks/companies/%s/tasks/%s' % (str(company_id), str(code))
+        data = {'code': code,
+                'description': description,
+                'url': url}
+        result = self.put(url, data)
+        return result  
+    
+    def put_team_task(self, company_id, team_id, code, description, url):
+        url = 'tasks/companies/%s/teams/%s/tasks/%s' % (str(company_id),
+                                                    str(team_id), str(code))
+        data = {'code': code,
+                'description': description,
+                'url': url}
+        result = self.put(url, data)
+        return result   
+
+    def put_user_task(self, company_id, team_id, user_id, code, 
+                      description, url):
+        url = 'tasks/companies/%s/teams/%s/users/%s/tasks/%s' %\
+             (str(company_id), str(team_id), str(user_id), str(code))
+        data = {'code': code,
+                'description': description,
+                'url': url}
+        result = self.put(url, data)
+        return result   
+
+    def delete_company_task(self, company_id, task_codes):
+        url = 'tasks/companies/%s/tasks/%s' % (str(company_id), 
+                                        _generate_many_tasks_url(task_codes))
+        return self.delete(url, {})
+
+    def delete_team_task(self, company_id, team_id, task_codes):
+        url = 'tasks/companies/%s/teams/%s/tasks/%s' % (str(company_id), 
+                            str(team_id), _generate_many_tasks_url(task_codes))
+        return self.delete(url, {})
+
+    def delete_user_task(self, company_id, team_id, user_id, task_codes):
+        url = 'tasks/companies/%s/teams/%s/users/%s/tasks/%s' %\
+                                 (str(company_id), str(team_id), str(user_id), 
+                                  _generate_many_tasks_url(task_codes))
+        return self.delete(url, {})
+    
+    def delete_all_company_tasks(self, company_id):
+        url = 'tasks/companies/%s/tasks/all_tasks' % (str(company_id))
+        return self.delete(url, {})
+
+    def delete_all_team_tasks(self, company_id, team_id):
+        url = 'tasks/companies/%s/teams/%s/tasks/all_tasks' % (str(company_id), 
+                                                      str(team_id))
+        return self.delete(url, {})
+
+    def delete_all_user_tasks(self, company_id, team_id, user_id):
+        url = 'tasks/companies/%s/teams/%s/users/%s/tasks/all_tasks' %\
+                     (str(company_id), str(team_id), str(user_id))
+        return self.delete(url, {})
+
+
+    def update_batch_tasks(self):
+        '''https://www.odesk.com/api/otask/v1/tasks/companies/:companyid/tasks/batch:data'''
+        pass
+      
 class GdsNamespace(Namespace):
     base_url = 'https://www.odesk.com/gds/'  
 
@@ -587,30 +744,6 @@ class GdsNamespace(Namespace):
    
     def get(self, url, data={}):
         return self.read(self.full_url(url), data, method='GET')
-  
-class GdsQ(object):
-    # Connection types
-    AND = 'AND'
-    OR = 'OR'
-    default = AND
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def _combine(self, other, conn):
-        if not isinstance(other, Q):
-            raise TypeError(other)
-        obj = type(self)()
-        obj.add(self, conn)
-        obj.add(other, conn)
-        return obj
-
-    def __or__(self, other):
-        return self._combine(other, self.OR)
-
-    def __and__(self, other):
-        return self._combine(other, self.AND)
-      
          
 class TimeReports(GdsNamespace): 
     api_url = 'timereports/'
@@ -624,10 +757,15 @@ class TimeReports(GdsNamespace):
             else:
                 tq += ', '+param
         if wheres:
-            tq += ' WHERE '
-            
+            tq += ' WHERE ('
+           
         for where in wheres:
             tq += where+' '
+        
+        if wheres:
+            tq += ')'
+            
+        #TODO: aggregation
         return tq
     
     def get_provider_report(self, provider_id, selects, wheres, hours=False):

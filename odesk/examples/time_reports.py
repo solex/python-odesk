@@ -26,11 +26,12 @@ def time_reports(public_key, secret_key):
     #typical for web apps, which wouldn't probably keep client instances 
     #between requests
     client = odesk.Client(public_key, secret_key, auth_token)
-    print client.time_reports.get_provider_report('user1', ['worked_on', 
+    print client.time_reports.get_provider_report('vhotsyk', ['worked_on', 
             'assignment_team_id', 'hours', 'earnings', 'earnings_offline', 
             'task', 'memo'],
-            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"])
- 
+            ["(", "worked_on", ">", "'2010-05-11'", ")", 'AND', 
+             "(", "worked_on", "<=", "'2010-05-13'", ")"])
+
     print client.time_reports.get_provider_report('user2', ['worked_on', 
             'assignment_team_id', 'hours', 'task', 'memo'],
             ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"],
