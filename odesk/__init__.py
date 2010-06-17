@@ -173,7 +173,6 @@ class Client(BaseClient):
         self.team = Team(self)
         self.hr = HR2(self)
         self.provider = Provider(self)
-        self.search_providers = SearchProvider(self)
         self.mc = Messages(self)
         self.time_reports = TimeReports(self)
         self.otask = OTask(self)
@@ -441,11 +440,6 @@ class Provider(Namespace):
         url = 'providers/%s/brief' % str(provider_ciphertext)
         result = self.get(url)
         return result['profile']
-
-
-class SearchProvider(Namespace):
-    api_url = 'profiles/'
-    version = 1
 
     def get_providers(self, q=''):
         url = 'search/providers'
