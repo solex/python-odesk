@@ -232,13 +232,15 @@ def test_base_client_read():
     except Exception, e:
         assert 0, "Incorrect exception raised for 500 code: " + str(e)    
     
-
-@patch('urllib2.urlopen', patched_urlopen)    
-def test_client():
+def get_client():
     public_key = 'public'
     secret_key = 'secret'
     api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
+    return Client(public_key, secret_key, api_token)
+
+@patch('urllib2.urlopen', patched_urlopen)    
+def test_client():
+    c = get_client()
     test_url = "http://test.url"
 
     result = c.get(test_url)
@@ -256,13 +258,8 @@ def test_client():
     
 @patch('urllib2.urlopen', patched_urlopen)    
 def test_namespace():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"  
-    
-    ns = Namespace(c)
+    ns = Namespace(get_client())
+    test_url = "http://test.url"
     
     #test full_url
     full_url = ns.full_url('test')
@@ -280,14 +277,8 @@ def test_namespace():
     result = ns.delete(test_url)
     assert result == sample_json_dict, result
 
-def setup_auth():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"   
-    
-    return Auth(c)
+def setup_auth():    
+    return Auth(get_client())
     
 def test_auth():
     
@@ -356,7 +347,8 @@ teamrooms_dict = {'teamrooms':
                   u'company_recno': u'1', 
                   u'teamroom_api': u'/api/team/v1/teamrooms/odesk:some.json', 
                   u'id': u'odesk:some'}},
-                  'teamroom': {'snapshot': 'test snapshot'}
+                  'teamroom': {'snapshot': 'test snapshot'},
+                  'snapshots': {'user': 'test', 'snapshot': 'test'}
                                }
 
 def return_teamrooms_json():
@@ -368,13 +360,7 @@ def patched_urlopen_teamrooms(request, *args, **kwargs):
 
 @patch('urllib2.urlopen', patched_urlopen_teamrooms)  
 def test_team():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-    
-    te = Team(c)
+    te = Team(get_client())
     
     #test full_url
     full_url = te.full_url('test')
@@ -387,7 +373,13 @@ def test_team():
     #test get_snapshots
     assert te.get_snapshots(1) == [teamrooms_dict['teamroom']['snapshot']],\
          te.get_snapshots(1)
-
+         
+    #test get_workdiaries
+    assert te.get_workdiaries(1, 1, 1) == (teamrooms_dict['snapshots']['user'],\
+        [teamrooms_dict['snapshots']['snapshot']]), te.get_workdiaries(1, 1, 1)
+    
+    
+    
 
 userroles = {u'userrole': 
              [{u'parent_team__reference': u'1', 
@@ -532,30 +524,39 @@ def patched_urlopen_hr(request, *args, **kwargs):
     return request
 
 @patch('urllib2.urlopen', patched_urlopen_hr)  
-def test_get_hrv2():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-    
-    hr = c.hr
+def test_get_hrv2_user():
+    hr = get_client().hr
     
     #test get_user
     assert hr.get_user(1) == hr_dict[u'user'], hr.get_user(1)
 
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_companies():
+    hr = get_client().hr
     #test get_companies
     assert hr.get_companies() == hr_dict[u'companies'], hr.get_companies()
     
     #test get_company
     assert hr.get_company(1) == hr_dict[u'company'], hr.get_company(1)
     
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_company_teams():
+    hr = get_client().hr    
     #test get_company_teams
     assert hr.get_company_teams(1) == hr_dict['teams'], hr.get_company_teams(1)
 
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_company_users():
+    hr = get_client().hr
     #test get_company_users
     assert hr.get_company_users(1) == hr_dict['users'], hr.get_company_users(1)
+    assert hr.get_company_users(1, False) == hr_dict['users'],\
+         hr.get_company_users(1, False)
+        
 
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_company_tasks():
+    hr = get_client().hr    
     #test get_company_tasks
     try:
         assert hr.get_company_tasks(1) == hr_dict['tasks'],\
@@ -565,15 +566,26 @@ def test_get_hrv2():
     except:
         assert 0, "APINotImplementedException not raised"
      
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_teams():
+    hr = get_client().hr        
     #test get_teams
     assert hr.get_teams() == hr_dict[u'teams'], hr.get_teams()
             
     #test get_team
     assert hr.get_team(1) == hr_dict[u'team'], hr.get_team(1)
         
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_team_users():
+    hr = get_client().hr             
     #test get_team_users
     assert hr.get_team_users(1) == hr_dict[u'users'], hr.get_team_users(1)
+    assert hr.get_team_users(1, False) == hr_dict[u'users'],\
+         hr.get_team_users(1, False)
     
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_team_tasks():
+    hr = get_client().hr         
     #test get_team_tasks
     try:
         assert hr.get_team_tasks(1) == hr_dict['tasks'], hr.get_team_tasks(1)
@@ -582,6 +594,9 @@ def test_get_hrv2():
     except:
         assert 0, "APINotImplementedException not raised"
      
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_userroles():
+    hr = get_client().hr        
     #test get_user_role
     assert hr.get_user_role(user_id=1) == hr_dict['userroles'],\
                                                  hr.get_user_role(user_id=1)
@@ -597,15 +612,24 @@ def test_get_hrv2():
     except:
         assert 0, "APINotImplementedException not raised"      
         
-        
+    
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_jobs():
+    hr = get_client().hr           
     #test get_jobs
     assert hr.get_jobs() == hr_dict[u'jobs'], hr.get_jobs()
     assert hr.get_job(1) == hr_dict[u'job'], hr.get_job(1)
-    
+  
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_offers():
+    hr = get_client().hr    
     #test get_offers
     assert hr.get_offers() == hr_dict[u'offers'], hr.get_offers()
     assert hr.get_offer(1) == hr_dict[u'offer'], hr.get_offer(1)
  
+@patch('urllib2.urlopen', patched_urlopen_hr)  
+def test_get_hrv2_engagements():
+    hr = get_client().hr 
     #test get_engagements
     assert hr.get_engagements() == hr_dict[u'engagements'], hr.get_engagements()
     assert hr.get_engagement(1) == hr_dict[u'engagement'], hr.get_engagement(1)
@@ -621,13 +645,8 @@ def patched_urlopen_hradjustment(request, *args, **kwargs):
 
 @patch('urllib2.urlopen', patched_urlopen_hradjustment)  
 def test_hrv2_post_adjustment():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-    
-    hr = c.hr
+    hr = get_client().hr
+
     result = hr.post_team_adjustment(1, 2, 100000, 'test', 'test note')
     assert result == adjustments[u'adjustment'], result
     
@@ -654,7 +673,8 @@ provider_dict = {'profile':
                       u'avg_category_score_recent': u'', 
                       u'avg_category_score': u'', u'order': u'2', u'label': u'Quality'},
                       ] 
-                   }}}
+                   }},
+                   'providers': {'test': 'test'}}
          
          
 def return_provider_json():
@@ -666,13 +686,7 @@ def patched_urlopen_provider(request, *args, **kwargs):
 
 @patch('urllib2.urlopen', patched_urlopen_provider)  
 def test_provider():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-    
-    pr = c.provider
+    pr = get_client().provider
     
     #test full_url
     full_url = pr.full_url('test')
@@ -684,6 +698,11 @@ def test_provider():
     #test get_provider_brief
     assert pr.get_provider_brief(1) == provider_dict['profile'],\
         pr.get_provider_brief(1)
+    
+    #test get_providers
+    assert pr.get_providers(q={'a': 1}) == provider_dict['providers'],\
+        pr.get_providers(q={'a': 1})
+    
     
 trays_dict = {'trays': [{u'unread': u'0', 
               u'type': u'sent', 
@@ -707,13 +726,7 @@ def patched_urlopen_trays(request, *args, **kwargs):
 
 @patch('urllib2.urlopen', patched_urlopen_trays)  
 def test_get_trays():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    mc = c.mc
+    mc = get_client().mc
     
     #test full_url
     full_url = mc.full_url('test')
@@ -721,6 +734,8 @@ def test_get_trays():
     
     #test get_trays
     assert mc.get_trays(1) == trays_dict['trays'], mc.get_trays(1)
+    assert mc.get_trays(1, paging_offset=10, paging_count=10) ==\
+         trays_dict['trays'], mc.get_trays(1, paging_offset=10, paging_count=10)
 
 tray_content_dict = {"current_tray": {
                                       "threads": '1'}}
@@ -734,18 +749,15 @@ def patched_urlopen_tray_content(request, *args, **kwargs):
     
 @patch('urllib2.urlopen', patched_urlopen_tray_content)  
 def test_get_tray_content():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    mc = c.mc
+    mc = get_client().mc
     
-    #test get_provider
+    #test get_tray_content
     assert mc.get_tray_content(1, 1) ==\
-         tray_content_dict['current_tray']['threads'], mc.get_tray_content(1, 1)
-     
+         tray_content_dict['current_tray']['threads'], mc.get_tray_content(1, 1)     
+    assert mc.get_tray_content(1, 1, paging_offset=10, paging_count=10) ==\
+         tray_content_dict['current_tray']['threads'],\
+         mc.get_tray_content(1, 1, paging_offset=10, paging_count=10)
+              
 thread_content_dict = {"thread": {"test": '1'}}
 
 def return_thread_content_json():
@@ -757,17 +769,15 @@ def patched_urlopen_thread_content(request, *args, **kwargs):
     
 @patch('urllib2.urlopen', patched_urlopen_thread_content)     
 def test_get_thread_content():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    mc = c.mc
+    mc = get_client().mc
     
     #test get_provider
     assert mc.get_thread_content(1, 1) ==\
          thread_content_dict['thread'], mc.get_thread_content(1, 1)
+    assert mc.get_thread_content(1, 1, paging_offset=10, paging_count=10) ==\
+         thread_content_dict['thread'],\
+         mc.get_thread_content(1, 1, paging_offset=10, paging_count=10)
+         
     
 read_thread_content_dict = {"thread": {"test": '1'}}
 
@@ -780,13 +790,7 @@ def patched_urlopen_read_thread_content(request, *args, **kwargs):
     
 @patch('urllib2.urlopen', patched_urlopen_read_thread_content)      
 def test_put_threads_read_unread():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    mc = c.mc
+    mc = get_client().mc
     
     read = mc.put_threads_read('test', [1,2,3])
     assert read == read_thread_content_dict, read
@@ -794,15 +798,12 @@ def test_put_threads_read_unread():
     unread = mc.put_threads_read('test', [5,6,7])
     assert unread == read_thread_content_dict, unread
     
+    read = mc.put_threads_unread('test', [1,2,3])
+    assert read == read_thread_content_dict, read    
+    
 @patch('urllib2.urlopen', patched_urlopen_read_thread_content)       
 def test_put_threads_starred_unstarred():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    mc = c.mc
+    mc = get_client().mc
     
     starred = mc.put_threads_starred('test', [1,2,3])
     assert starred == read_thread_content_dict, starred
@@ -813,13 +814,7 @@ def test_put_threads_starred_unstarred():
   
 @patch('urllib2.urlopen', patched_urlopen_read_thread_content)       
 def test_put_threads_deleted_undeleted():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    mc = c.mc
+    mc = get_client().mc
     
     deleted = mc.put_threads_deleted('test', [1,2,3])
     assert deleted == read_thread_content_dict, deleted 
@@ -829,14 +824,7 @@ def test_put_threads_deleted_undeleted():
      
 @patch('urllib2.urlopen', patched_urlopen_read_thread_content)       
 def test_post_message():                                                
-   
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    mc = c.mc       
+    mc = get_client().mc
     
     message = mc.post_message('username', 'recepient1,recepient2', 'subject', 
                               'body')
@@ -874,16 +862,229 @@ def patched_urlopen_time_report_content(request, *args, **kwargs):
     return request  
     
 @patch('urllib2.urlopen', patched_urlopen_time_report_content)      
-def test_get_time_report():
-    public_key = 'public'
-    secret_key = 'secret'
-    api_token = 'some_token'
-    c = Client(public_key, secret_key, api_token)
-    test_url = "http://test.url"
-
-    tc = c.time_reports
+def test_get_provider_time_report():
+    tc = get_client().time_reports
     
     read = tc.get_provider_report('test', ['1','2','3'], ['3','4','5'])
     assert read == time_report_dict, read
 
+    read = tc.get_provider_report('test', ['1','2','3'], ['3','4','5'], 
+                                  hours=True)
+    assert read == time_report_dict, read
+    
+@patch('urllib2.urlopen', patched_urlopen_time_report_content)      
+def test_get_company_time_report():
+    tc = get_client().time_reports
+    
+    read = tc.get_company_report('test', ['1','2','3'], ['3','4','5'])
+    assert read == time_report_dict, read
+
+    read = tc.get_company_report('test', ['1','2','3'], ['3','4','5'], 
+                                  hours=True)
+    assert read == time_report_dict, read
+    
+@patch('urllib2.urlopen', patched_urlopen_time_report_content)      
+def test_get_agency_time_report():
+    tc = get_client().time_reports
+    
+    read = tc.get_agency_report('test', 'test',  ['1','2','3'], ['3','4','5'])
+    assert read == time_report_dict, read
+
+    read = tc.get_agency_report('test', 'test',  ['1','2','3'], ['3','4','5'], 
+                                  hours=True)
+    assert read == time_report_dict, read    
+        
+def test_get_version():
+    import odesk
+    odesk.VERSION = (1, 2, 3, 'alpha', 2)
+    
+    assert get_version() == '1.2.3 alpha 2', get_version()
+    
+    odesk.VERSION = (1, 2, 3, 'alpha', 0)
+    assert get_version() == '1.2.3 pre-alpha', get_version()
+    
+task_dict = {u'tasks': 'task1' 
+     }    
+
+def return_task_dict_json(*args, **kwargs):
+    return json.dumps(task_dict)
+
+def patched_urlopen_task(request, *args, **kwargs):
+    request.read = return_task_dict_json
+    return request  
+    
+@patch('urllib2.urlopen', patched_urlopen_task)      
+def test_get_company_tasks():
+    task = get_client().otask
+        
+    assert task.get_company_tasks(1) == task_dict['tasks'],\
+     task.get_company_tasks(1)
+  
+@patch('urllib2.urlopen', patched_urlopen_task)    
+def test_get_team_tasks():
+    task = get_client().otask
+        
+    assert task.get_team_tasks(1, 1) == task_dict['tasks'],\
+     task.get_team_tasks(1, 1)
+
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_get_user_tasks():
+    task = get_client().otask
+        
+    assert task.get_user_tasks(1, 1, 1) == task_dict['tasks'],\
+     task.get_user_tasks(1, 1, 1)
+   
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_company_tasks_full():
+    task = get_client().otask
+        
+    assert task.get_company_tasks_full(1) == task_dict['tasks'],\
+     task.get_company_tasks_full(1)
+         
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_get_team_tasks_full():
+    task = get_client().otask
+        
+    assert task.get_team_tasks_full(1, 1) == task_dict['tasks'],\
+     task.get_team_tasks_full(1, 1)
+         
+         
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_get_user_tasks_full():
+    task = get_client().otask
+        
+    assert task.get_user_tasks_full(1, 1, 1) == task_dict['tasks'],\
+     task.get_user_tasks_full(1, 1, 1)
+    
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_get_company_specific_tasks():
+    task = get_client().otask
+        
+    assert task.get_company_specific_tasks(1, [1, 1]) == task_dict['tasks'],\
+     task.get_company_specific_tasks(1, [1, 1])
+
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_get_team_specific_tasks():
+    task = get_client().otask
+        
+    assert task.get_team_specific_tasks(1, 1, [1, 1]) == task_dict['tasks'],\
+     task.get_team_specific_tasks(1, 1, [1, 1])
+
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_get_user_specific_tasks():
+    task = get_client().otask
+        
+    assert task.get_user_specific_tasks(1, 1, 1, [1, 1]) == task_dict['tasks'],\
+     task.get_user_specific_tasks(1, 1, 1, [1, 1])
+    
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_post_company_task():    
+    task = get_client().otask
+        
+    assert task.post_company_task(1, 1, '1', 'ttt') == task_dict,\
+     task.post_company_task(1, 1, '1', 'ttt')
+
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_post_team_task():
+    task = get_client().otask
+        
+    assert task.post_team_task(1, 1, 1, '1', 'ttt') == task_dict,\
+     task.post_team_task(1, 1, 1, '1', 'ttt')    
+
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_post_user_task():
+    task = get_client().otask
+        
+    assert task.post_user_task(1, 1, 1, 1, '1', 'ttt') == task_dict,\
+     task.post_user_task(1, 1, 1, 1, '1', 'ttt')        
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_put_company_task():
+    task = get_client().otask
+        
+    assert task.put_company_task(1, 1, '1', 'ttt') == task_dict,\
+     task.put_company_task(1, 1, '1', 'ttt')      
+   
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_put_team_task():
+    task = get_client().otask
+        
+    assert task.put_team_task(1, 1, 1, '1', 'ttt') == task_dict,\
+     task.put_team_task(1, 1, 1, '1', 'ttt')      
+
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_put_user_task():
+    task = get_client().otask
+        
+    assert task.put_user_task(1, 1, 1, 1, '1', 'ttt') == task_dict,\
+     task.put_user_task(1, 1, 1, 1, '1', 'ttt') 
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_delete_company_task():
+    task = get_client().otask
+        
+    assert task.delete_company_task(1, [1, 1]) == task_dict,\
+     task.delete_company_task(1, [1, 1])     
+
+@patch('urllib2.urlopen', patched_urlopen_task)  
+def test_delete_team_task():
+    task = get_client().otask
+        
+    assert task.delete_team_task(1, 1, [1, 1]) == task_dict,\
+     task.delete_team_task(1, 1, [1, 1])        
+ 
+@patch('urllib2.urlopen', patched_urlopen_task)   
+def test_delete_user_task():
+    task = get_client().otask
+        
+    assert task.delete_user_task(1, 1, 1, [1, 1]) == task_dict,\
+     task.delete_user_task(1, 1, 1, [1, 1])      
+
+@patch('urllib2.urlopen', patched_urlopen_task) 
+def test_delete_all_company_tasks():
+    task = get_client().otask
+        
+    assert task.delete_all_company_tasks(1) == task_dict,\
+     task.delete_all_company_tasks(1)     
+
+
+@patch('urllib2.urlopen', patched_urlopen_task) 
+def test_delete_all_team_tasks():
+    task = get_client().otask
+        
+    assert task.delete_all_team_tasks(1, 1) == task_dict,\
+     task.delete_all_team_tasks(1, 1)     
+ 
+
+@patch('urllib2.urlopen', patched_urlopen_task) 
+def test_delete_all_user_tasks():
+    task = get_client().otask
+        
+    assert task.delete_all_user_tasks(1, 1, 1) == task_dict,\
+     task.delete_all_user_tasks(1, 1, 1)     
+
+
+@patch('urllib2.urlopen', patched_urlopen_task) 
+def test_update_batch_tasks():
+    task = get_client().otask
+        
+    assert task.update_batch_tasks(1, "1;2;3") == task_dict,\
+     task.update_batch_tasks(1, "1;2;3")     
+
+def test_gds_namespace():
+    gds = GdsNamespace(get_client())
+    
+    assert gds.urlopen('test.url', {}, 'POST') == None,\
+        gds.urlopen('test.url', {}, 'POST')
+        
+    
                                            

@@ -3,7 +3,7 @@ Python bindings to odesk API
 python-odesk version 0.0.3 alpha
 (C) 2010 oDesk
 """
-VERSION = (0, 0, 3, 'alpha', 2)
+VERSION = (0, 1, 0, 'alpha', 1)
 
 
 def get_version():
@@ -441,7 +441,7 @@ class Provider(Namespace):
         result = self.get(url)
         return result['profile']
 
-    def get_providers(self, q=''):
+    def get_providers(self, q={}):
         url = 'search/providers'
         result = self.get(url, data=q)
         return result['providers']
@@ -607,8 +607,8 @@ class OTask(Namespace):
         result = self.get(url)
         return result["tasks"]
 
-    def _generate_many_tasks_url(self, url, task_codes):
-        new_url = url
+    def _generate_many_tasks_url(self, task_codes):
+        new_url = ''
         for counter, task_code in enumerate(task_codes):
             if counter == 0:
                 new_url += '%s' % str(task_code)
@@ -618,14 +618,14 @@ class OTask(Namespace):
 
     def get_company_specific_tasks(self, company_id, task_codes):
         url = 'tasks/companies/%s/tasks/%s' % (str(company_id),
-                                        _generate_many_tasks_url(task_codes))
+                                    self._generate_many_tasks_url(task_codes))
         result = self.get(url)
         return result["tasks"]
 
     def get_team_specific_tasks(self, company_id, team_id, task_codes):
         url = 'tasks/companies/%s/teams/%s/tasks/%s' %\
                                              (str(company_id), str(team_id),
-                                         _generate_many_tasks_url(task_codes))
+                                    self._generate_many_tasks_url(task_codes))
         result = self.get(url)
         return result["tasks"]
 
@@ -633,7 +633,7 @@ class OTask(Namespace):
                                 task_codes):
         url = 'tasks/companies/%s/teams/%s/users/%s/tasks/%s' %\
                                 (str(company_id), str(team_id), str(user_id),
-                                 _generate_many_tasks_url(task_codes))
+                                 self._generate_many_tasks_url(task_codes))
         result = self.get(url)
         return result["tasks"]
 
@@ -693,18 +693,18 @@ class OTask(Namespace):
 
     def delete_company_task(self, company_id, task_codes):
         url = 'tasks/companies/%s/tasks/%s' % (str(company_id),
-                                        _generate_many_tasks_url(task_codes))
+                                    self._generate_many_tasks_url(task_codes))
         return self.delete(url, {})
 
     def delete_team_task(self, company_id, team_id, task_codes):
         url = 'tasks/companies/%s/teams/%s/tasks/%s' % (str(company_id),
-                            str(team_id), _generate_many_tasks_url(task_codes))
+                        str(team_id), self._generate_many_tasks_url(task_codes))
         return self.delete(url, {})
 
     def delete_user_task(self, company_id, team_id, user_id, task_codes):
         url = 'tasks/companies/%s/teams/%s/users/%s/tasks/%s' %\
                                  (str(company_id), str(team_id), str(user_id),
-                                  _generate_many_tasks_url(task_codes))
+                                 self. _generate_many_tasks_url(task_codes))
         return self.delete(url, {})
 
     def delete_all_company_tasks(self, company_id):
