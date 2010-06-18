@@ -92,6 +92,7 @@ class HttpRequest(urllib2.Request):
     """
     A hack around Request class that allows to specify HTTP method explicitly
     """
+
     def __init__(self, *args, **kwargs):
         #Request is an old-style class, so can't use `super`
         method = kwargs.pop('method', 'GET')
@@ -163,6 +164,7 @@ class Client(BaseClient):
     """
     Main API client
     """
+
     def __init__(self, public_key, secret_key, api_token=None, format='json'):
         self.public_key = public_key
         self.secret_key = secret_key
@@ -304,12 +306,14 @@ class HR2(Namespace):
     version = 2
 
     '''user api'''
+
     def get_user(self, user_id):
         url = 'users/%s' % str(user_id)
         result = self.get(url)
         return result['user']
 
     '''company api'''
+
     def get_companies(self):
         url = 'companies'
         result = self.get(url)
@@ -328,7 +332,7 @@ class HR2(Namespace):
     def get_company_tasks(self, company_id):
         raise APINotImplementedException("API doesn't support this call yet")
 
-    def get_company_users(self, company_id,  active=True):
+    def get_company_users(self, company_id, active=True):
         url = 'companies/%s/users' % str(company_id)
         if active:
             data = {'status_in_company': 'active'}
@@ -338,6 +342,7 @@ class HR2(Namespace):
         return result['users']
 
     '''team api'''
+
     def get_teams(self):
         url = 'teams'
         result = self.get(url)
@@ -375,10 +380,12 @@ class HR2(Namespace):
         return result['adjustment']
 
     '''task api'''
+
     def get_tasks(self):
         raise APINotImplementedException("API doesn't support this call yet")
 
     '''userrole api'''
+
     def get_user_role(self, user_id=None, team_id=None, sub_teams=False):
         '''
         Returns all the user roles that the user has in the teams.
@@ -394,6 +401,7 @@ class HR2(Namespace):
         return result['userroles']
 
     '''job api'''
+
     def get_jobs(self):
         url = 'jobs'
         result = self.get(url)
@@ -405,6 +413,7 @@ class HR2(Namespace):
         return result['job']
 
     '''offer api'''
+
     def get_offers(self):
         url = 'offers'
         result = self.get(url)
@@ -416,6 +425,7 @@ class HR2(Namespace):
         return result['offer']
 
     '''engagement api'''
+
     def get_engagements(self):
         url = 'engagements'
         result = self.get(url)
@@ -698,7 +708,7 @@ class OTask(Namespace):
 
     def delete_team_task(self, company_id, team_id, task_codes):
         url = 'tasks/companies/%s/teams/%s/tasks/%s' % (str(company_id),
-                        str(team_id), self._generate_many_tasks_url(task_codes))
+                    str(team_id), self._generate_many_tasks_url(task_codes))
         return self.delete(url, {})
 
     def delete_user_task(self, company_id, team_id, user_id, task_codes):
