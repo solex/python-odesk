@@ -3,3 +3,5 @@
 *.swo
 *.swp
 *.vim
+.project
+docs/*

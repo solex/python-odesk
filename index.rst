@@ -6,7 +6,7 @@ Python bindings to odesk API
    :maxdepth: 2
 
    getting_started.rst
-
+   full_list.rst
 
 Indices and tables
 ==================
