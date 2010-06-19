@@ -10,6 +10,9 @@ How to
 
 Authenticate
 -----------------
+
+http://developers.odesk.com/Authentication
+
 To authenticate your web application with the python-odesk, use next code::
 
     client = odesk.Client('your public key', 'your secret key')
@@ -28,17 +31,19 @@ To authenticate your web application with the python-odesk, use next code::
     client = odesk.Client('your public key', 'your secret key', auth_token)
 
 .. 
-.. _user_information:
+.. _provider_information:
 
-Get user's information
+Get provider's information
 ----------------------
+
+http://developers.odesk.com/Provider-Profile
 
 To get information about provider, use::
 
     client.provider.get_provider(provider_ciphertext)
     client.provider.get_provider_brief(provider_ciphertext)
 
-To search provider by the query string, use::
+To search provider(http://developers.odesk.com/search-providers) by the query string, use::
 
     client.provider.get_providers(q={})
 
@@ -48,6 +53,8 @@ To search provider by the query string, use::
 
 Get teams` information
 ----------------------
+
+http://developers.odesk.com/Team-API
 
 After authentication, you can get teams' information from client instance you have::
 
@@ -67,6 +74,8 @@ To get user's workdiaries inside the team::
 
 Get trays and messages
 ----------------------- 
+
+http://developers.odesk.com/Message-Center-API
 
 Get user's trays (if user not provided, authenticated user will be taken)::
      
@@ -88,6 +97,8 @@ Get content of the thread::
 Send message
 ----------------------   
 
+http://developers.odesk.com/Message-Center-API
+
 To send message::
 
     client.mc.post_message(username, recipients, subject, body, thread_id=None)
@@ -105,6 +116,8 @@ Where:
 
 Get timereports
 ----------------------
+
+http://developers.odesk.com/Time-Reports-API
 
 To get timereports, use, based on the level of the timereports you need::
 
@@ -135,4 +148,54 @@ For example::
             'task', 'memo'],
             ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"])
   
+
+.. 
+.. _work_with_tasks:
+
+Work with tasks
+----------------------   
+
+http://developers.odesk.com/oTasks-API
+
+To work with tasks you should use client.otask wrapper::
+
+    tasks = client.otask.get_company_tasks('company_id')
+    
+Methods to get tasks::
+
+    client.otask.get_team_tasks(company_id, team_id)
+    client.otask.get_user_tasks(company_id, team_id, user_id)
+    client.otask.get_company_tasks_full(company_id)
+    client.otask.get_team_tasks_full(company_id, team_id)
+    client.otask.get_user_tasks_full(company_id, team_id, user_id)
+    client.otask.get_company_specific_tasks(company_id, task_codes)
+    client.otask.get_team_specific_tasks(company_id, team_id, task_codes)
+    client.otask.get_user_specific_tasks(company_id, team_id, user_id, task_codes)
+    
+Create and update tasks::
+    
+    client.otask.post_company_task(company_id, code, description, url)
+    client.otask.post_team_task(company_id, team_id, code, description, url)
+    client.otask.post_user_task(company_id, team_id, user_id, code, description, url)
+    client.otask.put_company_task(company_id, code, description, url)
+    client.otask.put_team_task(company_id, team_id, code, description, url)
+    client.otask.put_user_task(company_id, team_id, user_id, code, description, url)
+    
+Delete tasks::
+    
+    client.otask.delete_company_task(company_id, task_codes)
+    client.otask.delete_team_task(company_id, team_id, task_codes)
+    client.otask.delete_user_task(company_id, team_id, user_id, task_codes)
+    client.otask.delete_all_company_tasks(company_id)
+    client.otask.delete_all_team_tasks(company_id, team_id)
+    client.otask.delete_all_user_tasks(company_id, team_id, user_id)
+
+Batch update of tasks::
+
+    client.otask.update_batch_tasks(company_id, csv_data)
+    
+Where csv_data - is the raw csv data for tasks to be updated. Example::
+
+    "acmeinc","","","ABC","Project ABC","https://www.acmeinc.com/project/abc"<br>"acmeinc","acmeinc:dev","b42","123","Task 123","https://www.acmeinc.com/task/123"    
+    
 
