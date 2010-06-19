@@ -7,6 +7,8 @@ Python bindings to odesk API
 
    getting_started.rst
    full_list.rst
+   how_to.rst
+   changelog.rst
 
 Indices and tables
 ==================

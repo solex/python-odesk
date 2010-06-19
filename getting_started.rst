@@ -10,7 +10,19 @@ Getting started
 
 Requirements
 -----------------
-No external dependencies
+No external dependencies for using python-odesk, but there are some to run the tests:
+
+Mock::
+
+    pip install mock
+    #or
+    easy_install mock    
+    
+Nosetests::
+
+    pip install nose
+    #or
+    easy_install nose        
 
 .. _install:
 
