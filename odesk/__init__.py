@@ -177,6 +177,7 @@ class Client(BaseClient):
         self.provider = Provider(self)
         self.mc = Messages(self)
         self.time_reports = TimeReports(self)
+        self.finreports = Finreports(self)
         self.otask = OTask(self)
 
     #Shortcuts for HTTP methods
@@ -822,6 +823,103 @@ class TimeReports(GdsNamespace):
         url = 'companies/%s/agencies/%s' % (str(company_id), str(agency_id))
         if hours:
             url += '/hours'
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+class Finreports(GdsNamespace):
+    api_url = 'finreports/'
+    version = 2
+
+    def _build_tq_param(self, selects, wheres):
+        tq = "SELECT "
+        for counter, param in enumerate(selects):
+            if counter == 0:
+                tq += param
+            else:
+                tq += ', ' + param
+        if wheres:
+            tq += ' WHERE ('
+
+        for where in wheres:
+            tq += where + ' '
+
+        if wheres:
+            tq += ')'
+
+        return tq
+
+    def get_provider_billings(self, provider_id, selects, wheres):
+        url = 'providers/%s/billings' % str(provider_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_provider_teams_billings(self, provider_team_id, selects, wheres):
+        url = 'provider_teams/%s/billings' % str(provider_team_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_provider_companies_billings(self, provider_company_id, selects,
+                                        wheres):
+        url = 'provider_companies/%s/billings' % str(provider_company_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_provider_earnings(self, provider_id, selects, wheres):
+        url = 'providers/%s/earnings' % str(provider_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_provider_teams_earnings(self, provider_team_id, selects,
+                                    wheres):
+        url = 'provider_teams/%s/earnings' % str(provider_team_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_provider_companies_earnings(self, provider_company_id, selects,
+                                        wheres):
+        url = 'provider_companies/%s/earnings' % str(provider_company_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_buyer_teams_billings(self, buyer_team_id, selects, wheres):
+        url = 'buyer_teams/%s/billings' % str(buyer_team_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_buyer_companies_billings(self, buyer_company_id, selects, wheres):
+        url = 'buyer_companies/%s/billings' % str(buyer_company_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_buyer_teams_earnings(self, buyer_team_id, selects, wheres):
+        url = 'buyer_teams/%s/earnings' % str(buyer_team_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_buyer_companies_earnings(self, buyer_company_id, selects, wheres):
+        url = 'buyer_companies/%s/earnings' % str(buyer_company_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+
+    def get_financial_entities(self, accounting_id, selects, wheres):
+        url = 'financial_accounts/%s' % str(accounting_id)
+        tq = self._build_tq_param(selects, wheres)
+        result = self.get(url, data={'tq': tq})
+        return result
+    
+    def get_financial_entities_provider(self, provider_id, selects, wheres):
+        url = 'financial_account_owner/%s' % str(provider_id)
         tq = self._build_tq_param(selects, wheres)
         result = self.get(url, data={'tq': tq})
         return result
