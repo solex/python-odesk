@@ -9,7 +9,6 @@ Python bindings to odesk API
    full_list.rst
    how_to.rst
    changelog.rst
-   notimplemented.rst
 
 Indices and tables
 ==================
