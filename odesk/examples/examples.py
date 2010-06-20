@@ -39,6 +39,8 @@ def web_based_app(public_key, secret_key):
     print client.hr.get_engagements()   
     print "HR: userroles"
     print client.hr.get_user_role()
+    print "Revoke access"
+    print client.auth.revoke_token()    
 
 
 if __name__ == '__main__':

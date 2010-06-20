@@ -264,7 +264,13 @@ class Auth(Namespace):
         except HTTP403ForbiddenError:
             return False
 
-
+    def revoke_token(self):
+        url = 'keys/token'
+        data = {'api_token': self.client.api_token,
+                'api_key': self.client.public_key,}
+        return self.delete(url, data)
+    
+    
 class Team(Namespace):
 
     api_url = 'team/'
