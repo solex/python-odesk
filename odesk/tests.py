@@ -331,6 +331,13 @@ def test_check_token_true():
     au = setup_auth()
     assert au.check_token(), au.check_token()
 
+@patch('urllib2.urlopen', patched_urlopen_token)      
+def test_revoke_token_true(): 
+    #check if ok  
+    au = setup_auth()
+    assert au.revoke_token(), au.revoke_token()
+
+
 @patch('urllib2.urlopen', patched_urlopen_403)
 def test_check_token_false():
     #check if denied
@@ -674,7 +681,8 @@ provider_dict = {'profile':
                       u'avg_category_score': u'', u'order': u'2', u'label': u'Quality'},
                       ] 
                    }},
-                   'providers': {'test': 'test'}}
+                   'providers': {'test': 'test'},
+                   'jobs': {'test': 'test'}}
          
          
 def return_provider_json():
@@ -700,9 +708,12 @@ def test_provider():
         pr.get_provider_brief(1)
     
     #test get_providers
-    assert pr.get_providers(q={'a': 1}) == provider_dict['providers'],\
-        pr.get_providers(q={'a': 1})
-    
+    assert pr.get_providers(data={'a': 1}) == provider_dict['providers'],\
+        pr.get_providers(data={'a': 1})
+   
+    #test get_jobs
+    assert pr.get_jobs(data={'a': 1}) == provider_dict['jobs'],\
+        pr.get_jobs(data={'a': 1})    
     
 trays_dict = {'trays': [{u'unread': u'0', 
               u'type': u'sent', 

@@ -39,6 +39,8 @@ def web_based_app(public_key, secret_key):
     print client.hr.get_engagements()   
     print "HR: userroles"
     print client.hr.get_user_role()
+    print "Get jobs"
+    print client.provider.get_jobs({'q': 'python'})    
     print "Revoke access"
     print client.auth.revoke_token()    
 

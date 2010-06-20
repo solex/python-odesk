@@ -457,10 +457,15 @@ class Provider(Namespace):
         result = self.get(url)
         return result['profile']
 
-    def get_providers(self, q={}):
+    def get_providers(self, data={}):
         url = 'search/providers'
-        result = self.get(url, data=q)
+        result = self.get(url, data=data)
         return result['providers']
+
+    def get_jobs(self, data={}):
+        url = 'search/jobs'
+        result = self.get(url, data=data)
+        return result['jobs']
 
 
 class Messages(Namespace):
