@@ -15,8 +15,3 @@ Financial reports
 
 .. 
 .. _search_jobs:
-
-Search jobs
------------------
-
-* http://developers.odesk.com/search-jobs

@@ -45,8 +45,11 @@ To get information about provider, use::
 
 To search provider(http://developers.odesk.com/search-providers) by the query string, use::
 
-    client.provider.get_providers(q={})
+    client.provider.get_providers(data={})
 
+To search jobs(http://developers.odesk.com/search-jobs) by the query string, use::
+
+    client.provider.get_jobs(data={})
 
 .. 
 .. _team_information:
