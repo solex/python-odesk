@@ -850,7 +850,7 @@ time_report_dict = {u'table':
      {u'rows': 
       [{u'c': 
         [{u'v': u'20100513'}, 
-         {u'v': u'odesk:odeskps'}, 
+         {u'v': u'company1:team1'}, 
          {u'v': u'1'}, 
          {u'v': u'1'}, 
          {u'v': u'0'}, 
@@ -904,7 +904,118 @@ def test_get_agency_time_report():
     read = tc.get_agency_report('test', 'test',  ['1','2','3'], ['3','4','5'], 
                                   hours=True)
     assert read == time_report_dict, read    
-        
+
+fin_report_dict = {u'table': 
+     {u'rows': 
+      [{u'c': 
+        [{u'v': u'20100513'}, 
+         {u'v': u'odesk:odeskps'}, 
+         {u'v': u'1'}, 
+         {u'v': u'1'}, 
+         {u'v': u'0'}, 
+         {u'v': u'1'}, 
+         {u'v': u'Bug 1: Test'}]}], 
+         u'cols': 
+         [{u'type': u'date', u'label': u'worked_on'}, 
+          {u'type': u'string', u'label': u'assignment_team_id'}, 
+          {u'type': u'number', u'label': u'hours'}, 
+          {u'type': u'number', u'label': u'earnings'}, 
+          {u'type': u'number', u'label': u'earnings_offline'}, 
+          {u'type': u'string', u'label': u'task'}, 
+          {u'type': u'string', u'label': u'memo'}]}}    
+
+def return_read_fin_report_json(*args, **kwargs):
+    return json.dumps(fin_report_dict)
+
+def patched_urlopen_fin_report_content(request, *args, **kwargs):
+    request.read = return_read_fin_report_json
+    return request  
+    
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_provider_billings():
+    fr = get_client().finreports
+    
+    read = fr.get_provider_billings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_provider_teams_billings():
+    fr = get_client().finreports
+    
+    read = fr.get_provider_teams_billings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_provider_companies_billings():
+    fr = get_client().finreports
+    
+    read = fr.get_provider_companies_billings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_provider_earnings():
+    fr = get_client().finreports
+    
+    read = fr.get_provider_earnings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_provider_teams_earnings():
+    fr = get_client().finreports
+    
+    read = fr.get_provider_teams_earnings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_provider_companies_earnings():
+    fr = get_client().finreports
+    
+    read = fr.get_provider_companies_earnings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_buyer_teams_billings():
+    fr = get_client().finreports
+    
+    read = fr.get_buyer_teams_billings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_buyer_companies_billings():
+    fr = get_client().finreports
+    
+    read = fr.get_buyer_companies_billings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+    
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_buyer_teams_earnings():
+    fr = get_client().finreports
+    
+    read = fr.get_buyer_teams_earnings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_buyer_companies_earnings():
+    fr = get_client().finreports
+    
+    read = fr.get_buyer_companies_earnings('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_financial_entities():
+    fr = get_client().finreports
+    
+    read = fr.get_financial_entities('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+@patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
+def test_get_financial_entities_provider():
+    fr = get_client().finreports
+    
+    read = fr.get_financial_entities_provider('test', ['1','2','3'], ['3','4','5'])
+    assert read == fin_report_dict, read
+
+
 def test_get_version():
     import odesk
     odesk.VERSION = (1, 2, 3, 'alpha', 2)
