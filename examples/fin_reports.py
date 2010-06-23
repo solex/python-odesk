@@ -3,9 +3,6 @@ import odesk
 PUBLIC_KEY = None
 SECRET_KEY = None
 
-PUBLIC_KEY = 'fc19c03b495dc46c1cd41437ee34a4be'
-SECRET_KEY = '3fa4d68bbde53c83'
-
 
 #TODO: Desktop app example (check if it's working at all - wasn't last time)
 
