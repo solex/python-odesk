@@ -5,6 +5,7 @@ python-odesk version 0.0.3 alpha
 """
 VERSION = (0, 1, 0, 'alpha', 1)
 
+from datetime import date
 
 def get_version():
     version = '%s.%s' % (VERSION[0], VERSION[1])
@@ -748,6 +749,98 @@ class OTask(Namespace):
         return self.put(url, {})
 
 
+class Q(object):
+    '''Simple query constructor'''
+    
+    def __init__(self, arg1, operator=None, arg2=None):
+        self.arg1 = arg1
+        self.operator = operator
+        self.arg2 = arg2
+
+    def __and__(self, other):
+        return self.__class__(self, 'AND', other)
+
+    def __or__(self, other):
+        return self.__class__(self, 'OR', other)
+
+    def __eq__(self, other):
+        return self.__class__(self, '=', other)
+
+    def __lt__(self, other):
+        return self.__class__(self, '<', other)
+
+    def __le__(self, other):
+        return self.__class__(self, '<=', other)
+
+    def __gt__(self, other):
+        return self.__class__(self, '>', other)
+
+    def __ge__(self, other):
+        return self.__class__(self, '>=', other)
+
+    def arg_to_string(self, arg):
+        if isinstance(arg, self.__class__):
+            if arg.operator:
+                return '(%s)' % arg
+            else:
+                return arg
+        elif isinstance(arg, str):
+            return "'%s'" % arg
+        elif isinstance(arg, date):
+            return "'%s'" % arg.isoformat()
+        else:
+            return str(arg)
+        
+    def __str__(self):
+        if self.operator:
+            str1 = self.arg_to_string(self.arg1)
+            str2 = self.arg_to_string(self.arg2)
+            return '%s %s %s' % (str1, self.operator, str2)
+        else:
+            return self.arg1
+        
+class Query(object):
+    '''Simple query'''
+
+    DEFAULT_TIMEREPORT_FIELDS = ['worked_on',
+                                 'team_id',
+                                 'team_name',
+                                 'task',
+                                 'memo',
+                                 'hours',]
+    DEFAULT_FINREPORT_FIELDS = ['reference',
+                                'date',
+                                'buyer_company__id',
+                                'buyer_company_name',
+                                'buyer_team__id',
+                                'buyer_team_name',
+                                'provider_company__id',
+                                'provider_company_name',
+                                'provider_team__id',
+                                'provider_team_name',
+                                'provider__id',
+                                'provider_name',
+                                'type',
+                                'subtype',
+                                'amount']
+
+    def __init__(self, select, where=None, order_by=None):
+        self.select  = select
+        self.where = where
+        self.order_by = order_by
+
+    def __str__(self):
+        select  = self.select
+        select_str = 'SELECT ' + ', '.join(select)
+        where_str = ''
+        if self.where:
+            where_str = ' WHERE %s' % self.where
+        order_by_str = ''
+        if self.order_by:
+            order_by_str = ' ORDER BY ' + ','.join(self.order_by)
+        return ''.join([select_str, where_str, order_by_str])
+        
+
 class GdsNamespace(Namespace):
     base_url = 'https://www.odesk.com/gds/'
 
@@ -780,50 +873,30 @@ class TimeReports(GdsNamespace):
     api_url = 'timereports/'
     version = 1
 
-    def _build_tq_param(self, selects, wheres):
-        tq = "SELECT "
-        for counter, param in enumerate(selects):
-            if counter == 0:
-                tq += param
-            else:
-                tq += ', ' + param
-        if wheres:
-            tq += ' WHERE ('
-
-        for where in wheres:
-            tq += where + ' '
-
-        if wheres:
-            tq += ')'
-
-        #TODO: aggregation
-        return tq
-
-    def get_provider_report(self, provider_id, selects, wheres, hours=False):
+    def get_provider_report(self, provider_id, query, hours=False):
         '''get provider's specific time report'''
         url = 'providers/%s' % str(provider_id)
         if hours:
             url += '/hours'
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_company_report(self, company_id, selects, wheres, hours=False):
+    def get_company_report(self, company_id, query, hours=False):
         '''get company's specific time report'''
         url = 'companies/%s' % str(company_id)
         if hours:
             url += '/hours'
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_agency_report(self, company_id, agency_id, selects, wheres,
-                          hours=False):
+    def get_agency_report(self, company_id, agency_id, query, hours=False):
         '''get agency's specific time report'''
         url = 'companies/%s/agencies/%s' % (str(company_id), str(agency_id))
         if hours:
             url += '/hours'
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
@@ -831,96 +904,75 @@ class Finreports(GdsNamespace):
     api_url = 'finreports/'
     version = 2
 
-    def _build_tq_param(self, selects, wheres):
-        tq = "SELECT "
-        for counter, param in enumerate(selects):
-            if counter == 0:
-                tq += param
-            else:
-                tq += ', ' + param
-        if wheres:
-            tq += ' WHERE ('
-
-        for where in wheres:
-            tq += where + ' '
-
-        if wheres:
-            tq += ')'
-
-        return tq
-
-    def get_provider_billings(self, provider_id, selects, wheres):
+    def get_provider_billings(self, provider_id, query):
         url = 'providers/%s/billings' % str(provider_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_provider_teams_billings(self, provider_team_id, selects, wheres):
+    def get_provider_teams_billings(self, provider_team_id, query):
         url = 'provider_teams/%s/billings' % str(provider_team_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_provider_companies_billings(self, provider_company_id, selects,
-                                        wheres):
+    def get_provider_companies_billings(self, provider_company_id, query):
         url = 'provider_companies/%s/billings' % str(provider_company_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_provider_earnings(self, provider_id, selects, wheres):
+    def get_provider_earnings(self, provider_id, query):
         url = 'providers/%s/earnings' % str(provider_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_provider_teams_earnings(self, provider_team_id, selects,
-                                    wheres):
+    def get_provider_teams_earnings(self, provider_team_id, query):
         url = 'provider_teams/%s/earnings' % str(provider_team_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_provider_companies_earnings(self, provider_company_id, selects,
-                                        wheres):
+    def get_provider_companies_earnings(self, provider_company_id, query):
         url = 'provider_companies/%s/earnings' % str(provider_company_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_buyer_teams_billings(self, buyer_team_id, selects, wheres):
+    def get_buyer_teams_billings(self, buyer_team_id, query):
         url = 'buyer_teams/%s/billings' % str(buyer_team_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_buyer_companies_billings(self, buyer_company_id, selects, wheres):
+    def get_buyer_companies_billings(self, buyer_company_id, query):
         url = 'buyer_companies/%s/billings' % str(buyer_company_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_buyer_teams_earnings(self, buyer_team_id, selects, wheres):
+    def get_buyer_teams_earnings(self, buyer_team_id, query):
         url = 'buyer_teams/%s/earnings' % str(buyer_team_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_buyer_companies_earnings(self, buyer_company_id, selects, wheres):
+    def get_buyer_companies_earnings(self, buyer_company_id, query):
         url = 'buyer_companies/%s/earnings' % str(buyer_company_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 
-    def get_financial_entities(self, accounting_id, selects, wheres):
+    def get_financial_entities(self, accounting_id, query):
         url = 'financial_accounts/%s' % str(accounting_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
     
-    def get_financial_entities_provider(self, provider_id, selects, wheres):
+    def get_financial_entities_provider(self, provider_id, query):
         url = 'financial_account_owner/%s' % str(provider_id)
-        tq = self._build_tq_param(selects, wheres)
+        tq = str(query)
         result = self.get(url, data={'tq': tq})
         return result
 

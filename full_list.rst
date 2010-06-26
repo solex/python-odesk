@@ -149,7 +149,42 @@ Other classes
 
 * TimeReports(GdsNamespace)
 
- * get_provider_report(self, provider_id, selects, wheres, hours=False)
- * get_company_report(self, company_id, selects, wheres, hours=False)
- * get_agency_report(self, company_id, agency_id, selects, wheres, hours=False)
- * selects and wheres are lists of params. They are joined while building the param string
+ * get_provider_report(self, provider_id, query, hours=False)
+ * get_company_report(self, company_id, query, hours=False)
+ * get_agency_report(self, company_id, agency_id, query, hours=False)
+ * query is the odesk.Query object
+ 
+* FinReports(GdsNamespace)
+ 
+ * get_provider_billings(self, provider_id, query)
+ * get_provider_teams_billings(self, provider_team_id, query)
+ * get_provider_companies_billings(self, provider_company_id, query)
+ * get_provider_earnings(self, provider_id, query)
+ * get_provider_teams_earnings(self, provider_team_id, query)
+ * get_provider_companies_earnings(self, provider_company_id, query)
+ * get_buyer_teams_billings(self, buyer_team_id, query)
+ * get_buyer_companies_billings(self, buyer_company_id, query)
+ * get_buyer_teams_earnings(self, buyer_team_id, query)
+ * get_buyer_companies_earnings(self, buyer_company_id, query)
+ * get_financial_entities(self, accounting_id, query)
+ * get_financial_entities_provider(self, provider_id, query)
+ 
+* Q(object)
+ 
+ * Simple query constructor
+ * Example of usage::
+  
+	odesk.Q('worked_on') <= date.today()
+  
+         
+* Query(object)
+ 
+ * Simple query
+ * DEFAULT_TIMEREPORT_FIELDS = ['worked_on', 'team_id', 'team_name', 'task', 'memo','hours',]
+ * DEFAULT_FINREPORT_FIELDS = ['reference', 'date', 'buyer_company__id', 'buyer_company_name', 'buyer_team__id', 'buyer_team_name', 'provider_company__id', 'provider_company_name', 'provider_team__id', 'provider_team_name', 'provider__id', 'provider_name', 'type', 'subtype', 'amount']
+ * __init__(self, select, where=None, order_by=None)
+ * __str__(self)
+ * Examples of usage::
+ 
+ 	odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, where=(odesk.Q('worked_on') <= date.today()) & (odesk.Q('worked_on') > '2010-05-01'))
+	odesk.Query(select=['date', 'type', 'amount'], where=(odesk.Q('date') <= date.today())) 

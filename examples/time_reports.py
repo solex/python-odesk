@@ -1,4 +1,5 @@
 import odesk
+from datetime import date
 
 PUBLIC_KEY = None
 SECRET_KEY = None
@@ -22,21 +23,21 @@ def time_reports(public_key, secret_key):
     #typical for web apps, which wouldn't probably keep client instances 
     #between requests
     client = odesk.Client(public_key, secret_key, auth_token)
-    print client.time_reports.get_provider_report('user2', ['worked_on', 
-            'assignment_team_id', 'hours', 'earnings', 'earnings_offline', 
-            'task', 'memo'],
-            ["(", "worked_on", ">", "'2010-05-11'", ")", 'AND', 
-             "(", "worked_on", "<=", "'2010-05-13'", ")"])
+    print client.time_reports.get_provider_report('user1', 
+                    odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, 
+                    where=(odesk.Q('worked_on') <= date.today()) &\
+                     (odesk.Q('worked_on') > '2010-05-01')))
 
-    print client.time_reports.get_provider_report('user2', ['worked_on', 
-            'assignment_team_id', 'hours', 'task', 'memo'],
-            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"],
-            hours=True)    
+    print client.time_reports.get_provider_report('user1', 
+                    odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, 
+                    where=(odesk.Q('worked_on') <= date.today()) &\
+                     (odesk.Q('worked_on') > '2010-05-01')), hours=True)
 
-    print client.time_reports.get_agency_report('company1', 'agency1', ['worked_on', 
-            'assignment_team_id', 'hours', 'earnings', 'earnings_offline', 
-            'task', 'memo'],
-            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"])
+    print client.time_reports.get_agency_report('company1', 'agency1', 
+                    odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, 
+                    where=(odesk.Q('worked_on') <= date.today()) &\
+                     (odesk.Q('worked_on') > '2010-05-01')), hours=True)
+    
  
 if __name__ == '__main__':
     public_key = PUBLIC_KEY or raw_input('Enter public key: ')

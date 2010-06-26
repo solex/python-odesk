@@ -34,7 +34,7 @@ To authenticate your web application with the python-odesk, use next code::
 .. _provider_information:
 
 Get provider's information
-----------------------
+--------------------------
 
 http://developers.odesk.com/Provider-Profile
 
@@ -124,32 +124,31 @@ http://developers.odesk.com/Time-Reports-API
 
 To get timereports, use, based on the level of the timereports you need::
 
-    client.time_reports.get_provider_report(provider_id, selects, wheres, hours=False):
-    client.time_reports.get_company_report(company_id, selects, wheres, hours=False):
-    client.time_reports.get_agency_report(company_id, agency_id, selects, wheres, hours=False):
+    client.time_reports.get_provider_report(provider_id, query, hours=False):
+    client.time_reports.get_company_report(company_id, query, hours=False):
+    client.time_reports.get_agency_report(company_id, agency_id, query, hours=False):
 
 Where:
- * selects = list of fields to select, see http://developers.odesk.com/Time-Reports-API
- * wheres = list of the conditions, see http://developers.odesk.com/Time-Reports-API
+ * query - is the odesk.Query object
  * hours = Limits the query to hour specific elements and hides all financial details. 
 
 For example::
 
-    client.time_reports.get_provider_report('user1', ['worked_on', 
-            'assignment_team_id', 'hours', 'earnings', 'earnings_offline', 
-            'task', 'memo'],
-            ["(", "worked_on", ">", "'2010-05-11'", ")", 'AND', 
-             "(", "worked_on", "<=", "'2010-05-13'", ")"])
+    client.time_reports.get_provider_report('user1', 
+           odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, 
+               			where=(odesk.Q('worked_on') <= date.today()) &\
+                   				(odesk.Q('worked_on') > '2010-05-01')))
 
-    client.time_reports.get_provider_report('user2', ['worked_on', 
-            'assignment_team_id', 'hours', 'task', 'memo'],
-            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"],
-            hours=True)    
 
-    client.time_reports.get_agency_report('company1', 'agency1', ['worked_on', 
-            'assignment_team_id', 'hours', 'earnings', 'earnings_offline', 
-            'task', 'memo'],
-            ["worked_on > '2010-05-11'", 'AND', "worked_on <= '2010-05-13'"])
+    client.time_reports.get_provider_report('user1', 
+           odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, 
+              			where=(odesk.Q('worked_on') <= date.today()) &\
+               					(odesk.Q('worked_on') > '2010-05-01')), hours=True)  
+
+    client.time_reports.get_agency_report('company1', 'agency1', 
+           odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, 
+               			where=(odesk.Q('worked_on') <= date.today()) &\
+               					(odesk.Q('worked_on') > '2010-05-01')), hours=True)
   
 
 .. 

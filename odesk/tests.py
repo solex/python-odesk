@@ -876,21 +876,21 @@ def patched_urlopen_time_report_content(request, *args, **kwargs):
 def test_get_provider_time_report():
     tc = get_client().time_reports
     
-    read = tc.get_provider_report('test', ['1','2','3'], ['3','4','5'])
+    read = tc.get_provider_report('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == time_report_dict, read
 
-    read = tc.get_provider_report('test', ['1','2','3'], ['3','4','5'], 
-                                  hours=True)
+    read = tc.get_provider_report('test', Query(select=['1','2','3'], where=(Q('2') > 1)), 
+                                                hours=True)
     assert read == time_report_dict, read
     
 @patch('urllib2.urlopen', patched_urlopen_time_report_content)      
 def test_get_company_time_report():
     tc = get_client().time_reports
     
-    read = tc.get_company_report('test', ['1','2','3'], ['3','4','5'])
+    read = tc.get_company_report('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == time_report_dict, read
 
-    read = tc.get_company_report('test', ['1','2','3'], ['3','4','5'], 
+    read = tc.get_company_report('test', Query(select=['1','2','3'], where=(Q('2') > 1)), 
                                   hours=True)
     assert read == time_report_dict, read
     
@@ -898,10 +898,10 @@ def test_get_company_time_report():
 def test_get_agency_time_report():
     tc = get_client().time_reports
     
-    read = tc.get_agency_report('test', 'test',  ['1','2','3'], ['3','4','5'])
+    read = tc.get_agency_report('test', 'test',  Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == time_report_dict, read
 
-    read = tc.get_agency_report('test', 'test',  ['1','2','3'], ['3','4','5'], 
+    read = tc.get_agency_report('test', 'test',  Query(select=['1','2','3'], where=(Q('2') > 1)), 
                                   hours=True)
     assert read == time_report_dict, read    
 
@@ -935,84 +935,84 @@ def patched_urlopen_fin_report_content(request, *args, **kwargs):
 def test_get_provider_billings():
     fr = get_client().finreports
     
-    read = fr.get_provider_billings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_provider_billings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_provider_teams_billings():
     fr = get_client().finreports
     
-    read = fr.get_provider_teams_billings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_provider_teams_billings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_provider_companies_billings():
     fr = get_client().finreports
     
-    read = fr.get_provider_companies_billings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_provider_companies_billings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_provider_earnings():
     fr = get_client().finreports
     
-    read = fr.get_provider_earnings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_provider_earnings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_provider_teams_earnings():
     fr = get_client().finreports
     
-    read = fr.get_provider_teams_earnings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_provider_teams_earnings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_provider_companies_earnings():
     fr = get_client().finreports
     
-    read = fr.get_provider_companies_earnings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_provider_companies_earnings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_buyer_teams_billings():
     fr = get_client().finreports
     
-    read = fr.get_buyer_teams_billings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_buyer_teams_billings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_buyer_companies_billings():
     fr = get_client().finreports
     
-    read = fr.get_buyer_companies_billings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_buyer_companies_billings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
     
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_buyer_teams_earnings():
     fr = get_client().finreports
     
-    read = fr.get_buyer_teams_earnings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_buyer_teams_earnings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_buyer_companies_earnings():
     fr = get_client().finreports
     
-    read = fr.get_buyer_companies_earnings('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_buyer_companies_earnings('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_financial_entities():
     fr = get_client().finreports
     
-    read = fr.get_financial_entities('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_financial_entities('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 @patch('urllib2.urlopen', patched_urlopen_fin_report_content)      
 def test_get_financial_entities_provider():
     fr = get_client().finreports
     
-    read = fr.get_financial_entities_provider('test', ['1','2','3'], ['3','4','5'])
+    read = fr.get_financial_entities_provider('test', Query(select=['1','2','3'], where=(Q('2') > 1)))
     assert read == fin_report_dict, read
 
 

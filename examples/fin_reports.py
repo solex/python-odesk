@@ -1,5 +1,7 @@
 import odesk
 
+from datetime import date
+
 PUBLIC_KEY = None
 SECRET_KEY = None
 
@@ -23,10 +25,10 @@ def fin_reports(public_key, secret_key):
     #typical for web apps, which wouldn't probably keep client instances 
     #between requests
     client = odesk.Client(public_key, secret_key, auth_token)
-    print client.finreports.get_financial_entities_provider('user1', ['date', 
-        'assignment__reference', 'assignment_name', 
-        'description', 'provider__id', 'provider_name', 'amount'],
-            ["date", ">", "'2010-05-11'", ])
+    print client.finreports.get_provider_billings('1111',  
+                    odesk.Query(select=['date', 'type',
+                                        'amount'], 
+                    where=((odesk.Q('date') <= date.today()))))
 
  
 if __name__ == '__main__':
