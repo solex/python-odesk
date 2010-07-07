@@ -1,6 +1,8 @@
 .. sampledoc documentation master file
 
-Python bindings to odesk API
+******************************************
+Python bindings to oDesk API
+******************************************
 
 .. toctree::
    :maxdepth: 2
@@ -11,9 +13,12 @@ Python bindings to odesk API
    changelog.rst
    license.rst
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+*********************
+Where I should look:
+*********************
+
+* Git repo: http://github.com/odesk/python-odesk
+* Issues: http://github.com/odesk/python-odesk/issues
+* Documentation: http://odesk.github.com/python-odesk/
+* Mailing list: python-odesk@googlegroups.com
