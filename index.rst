@@ -15,7 +15,7 @@ Python bindings to oDesk API
 
 
 *********************
-Where I should look:
+Urls:
 *********************
 
 * Git repo: http://github.com/odesk/python-odesk
