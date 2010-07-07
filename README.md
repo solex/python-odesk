@@ -4,7 +4,7 @@ All rights reserved.
 Python bindings to oDesk API
 =======================================
 
-* Git repo: http://github.com/odesk/python-odesk
-* Issues: http://github.com/odesk/python-odesk/issues
-* Documentation: http://odesk.github.com/python-odesk/
-* Mailing list: python-odesk@googlegroups.com
+* [Git repo](http://github.com/odesk/python-odesk)
+* [Issues](http://github.com/odesk/python-odesk/issues) 
+* [Documentation](http://odesk.github.com/python-odesk/) 
+* [Mailing list](http://groups.google.com/group/python-odesk)
