@@ -1,3 +1,8 @@
+"""
+Python bindings to odesk API
+python-odesk version 0.1
+(C) 2010 oDesk
+"""
 import odesk
 from datetime import date
 

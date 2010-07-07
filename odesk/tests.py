@@ -1,3 +1,8 @@
+"""
+Python bindings to odesk API
+python-odesk version 0.1
+(C) 2010 oDesk
+"""
 from odesk import *
 from mock import Mock, patch
 import urllib2
