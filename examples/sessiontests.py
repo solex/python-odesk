@@ -11,10 +11,10 @@ PASSWORD = None
 
 #TODO: Desktop app example (check if it's working at all - wasn't last time)
 
-def web_based_app(public_key, secret_key):
+def web_based_app(username, password):
     print "Emulating web-based app"
     #Instantiating a client without an auth token
-    client = odesk.SessionClient(USERNAME, PASSWORD)
+    client = odesk.SessionClient(username, password)
     print client.login()
     print "HR: teams"
     print client.hr.get_teams()
