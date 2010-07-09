@@ -401,7 +401,7 @@ class HR2(Namespace):
         data = {}
         if user_id:
             data = {'user__reference': user_id}
-        elif team_id:
+        if team_id:
             data = {'team__reference': team_id}
         data['include_sub_teams'] = sub_teams
         url = 'userroles'
