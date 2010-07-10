@@ -22,3 +22,4 @@ Urls:
 * Issues: http://github.com/odesk/python-odesk/issues
 * Documentation: http://odesk.github.com/python-odesk/
 * Mailing list: python-odesk@googlegroups.com
+* Facebook group: http://www.facebook.com/group.php?gid=136364403050710

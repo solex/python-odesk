@@ -44,7 +44,7 @@ Or via pip::
  
 Also, you can retrieve fresh version of python-odesk from GitHub::
 
-	git clone git://github.com/hotsyk/python-odesk.git
+	git clone git://github.com/odesk/python-odesk.git
 
 .. _settings:
     
