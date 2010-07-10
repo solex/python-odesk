@@ -11,6 +11,7 @@ getting_started.rst
 how_to.rst
 index.rst
 license.rst
+roadmap.rst
 odesk/__init__.py
 odesk/tests.py
 examples/examples.py

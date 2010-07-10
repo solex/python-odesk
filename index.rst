@@ -12,6 +12,7 @@ Python bindings to oDesk API
    how_to.rst
    changelog.rst
    license.rst
+   roadmap.rst
 
 
 *********************
