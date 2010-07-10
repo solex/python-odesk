@@ -258,6 +258,15 @@ class SessionClient(Client):
                 raise e
         self.session_id = result['session']['session_id']
         return result
+    
+    def logout(self):
+        url = self.base_url + 'auth/v%s/login' % self.version
+        try:
+            result = self.delete(url)
+        except urllib2.HTTPError, e:
+            raise e
+        self.session_id = None
+        return result    
 
 class Namespace(object):
     """

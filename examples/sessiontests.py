@@ -18,6 +18,9 @@ def web_based_app(username, password):
     print client.login()
     print "HR: teams"
     print client.hr.get_teams()
+    print client.logout()
+    print "HR: teams"
+    print client.hr.get_teams()    
     
    
 
