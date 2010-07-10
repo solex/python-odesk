@@ -23,6 +23,7 @@ def get_version():
 import urllib
 import urllib2
 import hashlib
+import cookielib
 
 try:
     import json
@@ -51,6 +52,14 @@ class InvalidConfiguredException(Exception):
 
 
 class APINotImplementedException(Exception):
+    pass
+
+
+class AuthenticationError(Exception):
+    pass
+
+
+class NotAuthenticatedError(Exception):
     pass
 
 
@@ -194,6 +203,61 @@ class Client(BaseClient):
     def delete(self, url, data={}):
         return self.read(url, data, method='DELETE', format=self.format)
 
+
+class SessionClient(Client):
+    """
+    Session based auth API client
+    """
+    version = 1
+    base_url = 'https://www.odesk.com/api/'    
+
+    def __init__(self, odesk_username=None, odesk_password=None, 
+                 session_id=None, cookies=None, format='json'):
+        self.odesk_username = odesk_username
+        self.odesk_password = odesk_password
+        self.session_id = session_id
+        self.format = format
+        self.cookies = cookies
+        #Namespaces
+        self.auth = Auth(self)
+        self.team = Team(self)
+        self.hr = HR2(self)
+        self.provider = Provider(self)
+        self.mc = Messages(self)
+        self.time_reports = TimeReports(self)
+        self.finreports = Finreports(self)
+        self.otask = OTask(self)
+
+    def urlencode(self, data={}):
+        data = data.copy()
+        if self.session_id:
+            data['session_id'] = self.session_id
+        return urllib.urlencode(data)
+    
+    def urlopen(self, url, data={}, method='GET'):
+        cookies = self.cookies or cookielib.CookieJar()
+        self.cookies = cookies
+        
+        urlopener = urllib2.build_opener(urllib2.HTTPRedirectHandler,
+                                     urllib2.HTTPCookieProcessor(cookies))
+    
+        urllib2.install_opener(urlopener)
+        
+        return super(SessionClient, self).urlopen(url, data, method)
+        
+    def login(self):
+        url = self.base_url + 'auth/v%s/login' % self.version
+        data = {'username': self.odesk_username, 
+                'password': self.odesk_password}
+        try:
+            result = self.read(url, data=data, method='POST')
+        except urllib2.HTTPError, e:
+            if e.code == 401:
+                raise AuthenticationError('Wrong username or password')
+            else:
+                raise e
+        self.session_id = result['session']['session_id']
+        return result
 
 class Namespace(object):
     """
