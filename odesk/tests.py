@@ -1,6 +1,6 @@
 """
 Python bindings to odesk API
-python-odesk version 0.1
+python-odesk version 0.2
 (C) 2010 oDesk
 """
 from odesk import *
@@ -610,10 +610,10 @@ def test_get_hrv2_team_tasks():
 def test_get_hrv2_userroles():
     hr = get_client().hr        
     #test get_user_role
-    assert hr.get_user_role(user_id=1) == hr_dict['userroles'],\
-                                                 hr.get_user_role(user_id=1)
-    assert hr.get_user_role(team_id=1) == hr_dict['userroles'],\
-                                                 hr.get_user_role(team_id=1)
+    assert hr.get_user_role(user_reference=1) == hr_dict['userroles'],\
+                                                 hr.get_user_role(user_reference=1)
+    assert hr.get_user_role(team_reference=1) == hr_dict['userroles'],\
+                                                 hr.get_user_role(team_reference=1)
     assert hr.get_user_role() == hr_dict['userroles'], hr.get_user_role()
 
         

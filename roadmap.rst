@@ -7,28 +7,18 @@ Roadmap
 
 .. 
 
-.. _0.2:
-
-Version 0.2
------------------
-*August 2010*
-
-* SessionClient to be able to use library with the session based auth
-* Change of the params in the methods to reflect real params of API
-
-
 .. _0.3:
 
 Version 0.3
 -----------------
-*October 2010*
+*September 2010*
 
 
 .. _0.4:
 
 Version 0.4
 -----------------
-
+*October 2010*
 
 
 

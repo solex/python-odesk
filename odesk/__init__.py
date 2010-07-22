@@ -1,9 +1,9 @@
 """
 Python bindings to odesk API
-python-odesk version 0.1
+python-odesk version 0.2
 (C) 2010 oDesk
 """
-VERSION = (0, 1, 1, 'final', 1)
+VERSION = (0, 2, 0, 'alpha', 1)
 
 from datetime import date
 
@@ -221,7 +221,6 @@ class SessionClient(Client):
         self.format = format
         self.cookies = cookies
         #Namespaces
-        self.auth = Auth(self)
         self.team = Team(self)
         self.hr = HR2(self)
         self.provider = Provider(self)
@@ -362,7 +361,7 @@ class Team(Namespace):
         return teamrooms
 
     def get_snapshots(self, team_id, online='now'):
-        url = 'teamrooms/%s' % team_id
+        url = 'snapshots/%s' % team_id
         result = self.get(url, {'online': online})
         snapshots = result['teamroom']['snapshot']
         if not isinstance(snapshots, list):
@@ -390,8 +389,8 @@ class HR2(Namespace):
 
     '''user api'''
 
-    def get_user(self, user_id):
-        url = 'users/%s' % str(user_id)
+    def get_user(self, user_reference):
+        url = 'users/%s' % str(user_reference)
         result = self.get(url)
         return result['user']
 
@@ -402,21 +401,21 @@ class HR2(Namespace):
         result = self.get(url)
         return result['companies']
 
-    def get_company(self, company_id):
-        url = 'companies/%s' % str(company_id)
+    def get_company(self, company_referece):
+        url = 'companies/%s' % str(company_referece)
         result = self.get(url)
         return result['company']
 
-    def get_company_teams(self, company_id):
-        url = 'companies/%s/teams' % str(company_id)
+    def get_company_teams(self, company_referece):
+        url = 'companies/%s/teams' % str(company_referece)
         result = self.get(url)
         return result['teams']
 
-    def get_company_tasks(self, company_id):
+    def get_company_tasks(self, company_referece):
         raise APINotImplementedException("API doesn't support this call yet")
 
-    def get_company_users(self, company_id, active=True):
-        url = 'companies/%s/users' % str(company_id)
+    def get_company_users(self, company_referece, active=True):
+        url = 'companies/%s/users' % str(company_referece)
         if active:
             data = {'status_in_company': 'active'}
         else:
@@ -431,17 +430,17 @@ class HR2(Namespace):
         result = self.get(url)
         return result['teams']
 
-    def get_team(self, team_id, include_users=False):
-        url = 'teams/%s' % str(team_id)
+    def get_team(self, team_reference, include_users=False):
+        url = 'teams/%s' % str(team_reference)
         result = self.get(url, {'include_users': include_users})
         #TODO: check how included users returned
         return result['team']
 
-    def get_team_tasks(self, team_id):
+    def get_team_tasks(self, team_reference):
         raise APINotImplementedException("API doesn't support this call yet")
 
-    def get_team_users(self, team_id, active=True):
-        url = 'teams/%s/users' % str(team_id)
+    def get_team_users(self, team_reference, active=True):
+        url = 'teams/%s/users' % str(team_reference)
         if active:
             data = {'status_in_team': 'active'}
         else:
@@ -449,13 +448,13 @@ class HR2(Namespace):
         result = self.get(url, data)
         return result['users']
 
-    def post_team_adjustment(self, team_id, engagement_id, amount, comments,
-                             notes):
+    def post_team_adjustment(self, team_reference, engagement_reference, amount,
+                             comments, notes):
         '''
         Add bonus to engagement
         '''
-        url = 'teams/%s/adjustments' % str(team_id)
-        data = {'engagement__reference': engagement_id,
+        url = 'teams/%s/adjustments' % str(team_reference)
+        data = {'engagement__reference': engagement_reference,
                 'amount': amount,
                 'comments': comments,
                 'notes': notes}
@@ -469,15 +468,16 @@ class HR2(Namespace):
 
     '''userrole api'''
 
-    def get_user_role(self, user_id=None, team_id=None, sub_teams=False):
+    def get_user_role(self, user_reference=None, team_reference=None, 
+                      sub_teams=False):
         '''
         Returns all the user roles that the user has in the teams.
         '''
         data = {}
-        if user_id:
-            data['user__reference'] = user_id
-        if team_id:
-            data['team__reference'] = team_id
+        if user_reference:
+            data['user__reference'] = user_reference
+        if team_reference:
+            data['team__reference'] = team_reference
         data['include_sub_teams'] = sub_teams
         url = 'userroles'
         result = self.get(url, data)
@@ -485,37 +485,113 @@ class HR2(Namespace):
 
     '''job api'''
 
-    def get_jobs(self):
+    def get_jobs(self, buyer_team_reference=None, include_sub_teams=False,
+                 status=None, created_by=None, created_time_from=None,
+                 created_time_to=None):
         url = 'jobs'
-        result = self.get(url)
+        
+        data = {}
+        if buyer_team_reference:
+            data['buyer_team__reference'] = buyer_team_reference
+        
+        data['include_sub_teams'] = False
+        if include_sub_teams:
+            data['include_sub_teams'] = include_sub_teams            
+        
+        if status:
+            data['status'] = status            
+
+        if created_by:
+            data['created_by'] = created_by            
+
+        if created_time_from:
+            data['created_time_from'] = created_time_from            
+            
+        if created_time_to:
+            data['created_time_to'] = created_time_to            
+                                                        
+        result = self.get(url, data)
         return result['jobs']
 
-    def get_job(self, job_id):
-        url = 'jobs/%s' % str(job_id)
+    def get_job(self, job_reference):
+        url = 'jobs/%s' % str(job_reference)
         result = self.get(url)
         return result['job']
 
     '''offer api'''
 
-    def get_offers(self):
+    def get_offers(self, buyer_team_reference=None, status=None, job_ref=None, 
+                   buyer_ref=None, provider_ref=None, agency_ref=None, 
+                   created_time_from=None, created_time_to=None):
         url = 'offers'
-        result = self.get(url)
+        data = {}
+        if buyer_team_reference:
+            data['buyer_team__reference'] = buyer_team_reference
+        
+        if status:
+            data['status'] = status            
+
+        if job_ref:
+            data['job_ref'] = job_ref     
+
+        if buyer_ref:
+            data['buyer_ref'] = buyer_ref 
+            
+        if provider_ref:
+            data['provider_ref'] = provider_ref    
+            
+        if agency_ref:
+            data['agency_ref'] = agency_ref                                                 
+
+        if created_time_from:
+            data['created_time_from'] = created_time_from            
+            
+        if created_time_to:
+            data['created_time_to'] = created_time_to        
+                    
+        result = self.get(url, data)
         return result['offers']
 
-    def get_offer(self, offer_id):
-        url = 'offers/%s' % str(offer_id)
+    def get_offer(self, offer_reference):
+        url = 'offers/%s' % str(offer_reference)
         result = self.get(url)
         return result['offer']
 
     '''engagement api'''
 
-    def get_engagements(self):
+    def get_engagements(self, buyer_team_reference=None, include_sub_teams=False,
+                 status=None, provider_ref=None, agency_ref=None, 
+                 created_time_from=None, created_time_to=None):
         url = 'engagements'
-        result = self.get(url)
+        
+        data = {}
+        if buyer_team_reference:
+            data['buyer_team__reference'] = buyer_team_reference
+        
+        data['include_sub_teams'] = False
+        if include_sub_teams:
+            data['include_sub_teams'] = include_sub_teams            
+        
+        if status:
+            data['status'] = status            
+
+        if provider_ref:
+            data['provider_ref'] = provider_ref 
+
+        if agency_ref:
+            data['agency_ref'] = agency_ref           
+
+        if created_time_from:
+            data['created_time_from'] = created_time_from            
+            
+        if created_time_to:
+            data['created_time_to'] = created_time_to           
+        
+        result = self.get(url, data)
         return result['engagements']
 
-    def get_engagement(self, engagement_id):
-        url = 'engagements/%s' % str(engagement_id)
+    def get_engagement(self, engagement_reference):
+        url = 'engagements/%s' % str(engagement_reference)
         result = self.get(url)
         return result['engagement']
 

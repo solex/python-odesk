@@ -7,6 +7,17 @@ Changelog
 
 .. 
 
+.. _0.2:
+
+Version 0.2
+-----------------
+*August 2010*
+
+* Added SessionClient to be able to use all bindings' methods with the session based auth
+* All helpers classes moved to the utils.py, added Table helper class
+* *Incompatibility with previous release* Changed names of the methods' params to reflect real oDesk params - e.g. company_reference vs company name
+
+
 .. _0.1.1:
 
 Version 0.1.1

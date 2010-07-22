@@ -16,11 +16,11 @@ Python bindings to oDesk API
 
 
 *********************
-Urls:
+Urls
 *********************
 
 * Git repo: http://github.com/odesk/python-odesk
 * Issues: http://github.com/odesk/python-odesk/issues
 * Documentation: http://odesk.github.com/python-odesk/
-* Mailing list: python-odesk@googlegroups.com
+* Mailing list: http://groups.google.com/group/python-odesk (python-odesk@googlegroups.com)
 * Facebook group: http://www.facebook.com/group.php?gid=136364403050710

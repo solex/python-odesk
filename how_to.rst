@@ -30,6 +30,18 @@ To authenticate your web application with the python-odesk, use next code::
     #between requests
     client = odesk.Client('your public key', 'your secret key', auth_token)
 
+.. _session_authenticate:
+
+Use session based authentication
+---------------------------------
+
+http://developers.odesk.com/Authentication
+
+To authenticate your web application with the python-odesk, using session based authentication with your odesk username and your odesk pasword, use next code::
+
+    client = odesk.SessionClient('your odesk username', 'your odesk password')
+    client.login()
+
 .. 
 .. _provider_information:
 
@@ -150,6 +162,14 @@ For example::
                			where=(odesk.Q('worked_on') <= date.today()) &\
                					(odesk.Q('worked_on') > '2010-05-01')), hours=True)
   
+
+.. 
+.. _get_finreports:
+
+Get finreports
+----------------------
+
+*TODO*
 
 .. 
 .. _work_with_tasks:

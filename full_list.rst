@@ -61,8 +61,37 @@ Client
   * provider
   * mc
   * time_reports
+  * finreports
   * otask
 
+.. _session_client:
+    
+SessionClient
+---------------------
+
+* class SessionClient(Client)
+
+ * def __init__(self, odesk_username=None, odesk_password=None, session_id=None, cookies=None, format='json')
+ * def urlencode(self, data={})
+ * def urlopen(self, url, data={}, method='GET')
+ * def login(self)
+ * def logout(self)
+  
+ * Variables available inside Client:
+ 
+  * odesk_username
+  * odesk_password
+  * session_id
+  * cookies
+  * format
+  * team
+  * hr
+  * provider
+  * mc
+  * time_reports
+  * finreports
+  * otask
+  
 .. _classes:
     
 Other classes
@@ -168,23 +197,27 @@ Other classes
  * get_buyer_companies_earnings(self, buyer_company_id, query)
  * get_financial_entities(self, accounting_id, query)
  * get_financial_entities_provider(self, provider_id, query)
- 
-* Q(object)
- 
- * Simple query constructor
- * Example of usage::
-  
-	odesk.Q('worked_on') <= date.today()
-  
-         
-* Query(object)
- 
- * Simple query
- * DEFAULT_TIMEREPORT_FIELDS = ['worked_on', 'team_id', 'team_name', 'task', 'memo','hours',]
- * DEFAULT_FINREPORT_FIELDS = ['reference', 'date', 'buyer_company__id', 'buyer_company_name', 'buyer_team__id', 'buyer_team_name', 'provider_company__id', 'provider_company_name', 'provider_team__id', 'provider_team_name', 'provider__id', 'provider_name', 'type', 'subtype', 'amount']
- * __init__(self, select, where=None, order_by=None)
- * __str__(self)
- * Examples of usage::
- 
- 	odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, where=(odesk.Q('worked_on') <= date.today()) & (odesk.Q('worked_on') > '2010-05-01'))
-	odesk.Query(select=['date', 'type', 'amount'], where=(odesk.Q('date') <= date.today())) 
+
+* utils.py
+
+	* Q(object)
+	 
+	 * Simple query constructor
+	 * Example of usage::
+	  
+		odesk.Q('worked_on') <= date.today()
+	  
+	         
+	* Query(object)
+	 
+	 * Simple query
+	 * DEFAULT_TIMEREPORT_FIELDS = ['worked_on', 'team_id', 'team_name', 'task', 'memo','hours',]
+	 * DEFAULT_FINREPORT_FIELDS = ['reference', 'date', 'buyer_company__id', 'buyer_company_name', 'buyer_team__id', 'buyer_team_name', 'provider_company__id', 'provider_company_name', 'provider_team__id', 'provider_team_name', 'provider__id', 'provider_name', 'type', 'subtype', 'amount']
+	 * __init__(self, select, where=None, order_by=None)
+	 * __str__(self)
+	 * Examples of usage::
+	 
+	 	odesk.Query(select=odesk.Query.DEFAULT_TIMEREPORT_FIELDS, where=(odesk.Q('worked_on') <= date.today()) & (odesk.Q('worked_on') > '2010-05-01'))
+		odesk.Query(select=['date', 'type', 'amount'], where=(odesk.Q('date') <= date.today()))
+		
+	* Table(object) 
