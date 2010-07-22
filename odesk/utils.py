@@ -9,7 +9,7 @@ from datetime import date
 
 class Q(object):
     '''Simple query constructor'''
-    
+
     def __init__(self, arg1, operator=None, arg2=None):
         self.arg1 = arg1
         self.operator = operator
@@ -48,7 +48,7 @@ class Q(object):
             return "'%s'" % arg.isoformat()
         else:
             return str(arg)
-        
+
     def __str__(self):
         if self.operator:
             str1 = self.arg_to_string(self.arg1)
@@ -56,7 +56,8 @@ class Q(object):
             return '%s %s %s' % (str1, self.operator, str2)
         else:
             return self.arg1
-        
+
+
 class Query(object):
     '''Simple query'''
 
@@ -65,7 +66,7 @@ class Query(object):
                                  'team_name',
                                  'task',
                                  'memo',
-                                 'hours',]
+                                 'hours']
     DEFAULT_FINREPORT_FIELDS = ['reference',
                                 'date',
                                 'buyer_company__id',
@@ -83,12 +84,12 @@ class Query(object):
                                 'amount']
 
     def __init__(self, select, where=None, order_by=None):
-        self.select  = select
+        self.select = select
         self.where = where
         self.order_by = order_by
 
     def __str__(self):
-        select  = self.select
+        select = self.select
         select_str = 'SELECT ' + ', '.join(select)
         where_str = ''
         if self.where:
@@ -97,7 +98,6 @@ class Query(object):
         if self.order_by:
             order_by_str = ' ORDER BY ' + ','.join(self.order_by)
         return ''.join([select_str, where_str, order_by_str])
-    
 
 
 class Table(object):
@@ -121,8 +121,7 @@ class Table(object):
         if isinstance(key, slice):
             return [dict(zip(self.cols, row)) for row in self.rows[key]]
         else:
-            return dict(zip(self.cols,self.rows[key]))
+            return dict(zip(self.cols, self.rows[key]))
 
     def __len__(self):
         return len(self.rows)
-    
