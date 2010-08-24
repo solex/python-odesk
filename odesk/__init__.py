@@ -951,6 +951,15 @@ class TimeReports(GdsNamespace):
         result = self.get(url, data={'tq': tq})
         return result
 
+    def get_team_report(self, company_id, team_id, query, hours=False):
+        '''get company's specific time report'''
+        url = 'companies/%s/teams/%s' % (str(company_id), str(team_id))
+        if hours:
+            url += '/hours'
+        tq = str(query)
+        result = self.get(url, data={'tq': tq})
+        return result
+
     def get_agency_report(self, company_id, agency_id, query, hours=False):
         '''get agency's specific time report'''
         url = 'companies/%s/agencies/%s' % (str(company_id), str(agency_id))
