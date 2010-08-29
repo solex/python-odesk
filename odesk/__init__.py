@@ -148,6 +148,10 @@ class BaseClient(object):
             data['http_method'] = method.lower()
         #End of hack
 
+        self.last_method = method
+        self.last_url = url
+        self.last_data = data
+
         query = self.urlencode(data)
         if method == 'GET':
             url += '?' + query
