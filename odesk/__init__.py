@@ -191,6 +191,7 @@ class Client(BaseClient):
         self.time_reports = TimeReports(self)
         self.finreports = Finreports(self)
         self.otask = OTask(self)
+        self.finance = Finance(self)
 
     #Shortcuts for HTTP methods
     def get(self, url, data={}):
@@ -228,6 +229,7 @@ class SessionClient(Client):
         self.time_reports = TimeReports(self)
         self.finreports = Finreports(self)
         self.otask = OTask(self)
+        self.finance = Finance(self)
 
     def urlencode(self, data={}):
         data = data.copy()
@@ -900,6 +902,17 @@ class OTask(Namespace):
         return self.put(url, {})
 
 
+class Finance(Namespace):
+    api_url = 'finance/'
+    version = 1
+
+    def get_withdrawal_methods(self):
+        return self.get('withdrawals')
+
+    def post_withdrawal(self, method_ref, amount):
+        url = 'withdrawals/%s' % method_ref
+        data = {'amount': amount}
+        return self.post(url, data)
 
 class GdsNamespace(Namespace):
     base_url = 'https://www.odesk.com/gds/'

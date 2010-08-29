@@ -43,6 +43,8 @@ def web_based_app(public_key, secret_key):
     print client.hr.get_user_role()
     print "Get jobs"
     print client.provider.get_jobs({'q': 'python'})    
+    print "Financial: withdrawal methods"
+    print client.finance.get_withdrawal_methods()
     print "Revoke access"
     print client.auth.revoke_token()    
 
