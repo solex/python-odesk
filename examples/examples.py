@@ -28,25 +28,29 @@ def web_based_app(public_key, secret_key):
     #typical for web apps, which wouldn't probably keep client instances 
     #between requests
     client = odesk.Client(public_key, secret_key, auth_token)
-    print "Team rooms:"
-    print client.team.get_teamrooms()
-    #HRv2 API
-    print "HR: companies" 
-    print client.hr.get_companies()
-    print "HR: teams"
-    print client.hr.get_teams()
-    print "HR: offers"
-    print client.hr.get_offers()
-    print "HR: get_engagements"
-    print client.hr.get_engagements()   
-    print "HR: userroles"
-    print client.hr.get_user_role()
-    print "Get jobs"
-    print client.provider.get_jobs({'q': 'python'})    
-    print "Financial: withdrawal methods"
-    print client.finance.get_withdrawal_methods()
-    print "Revoke access"
-    print client.auth.revoke_token()    
+    try:
+        print "Team rooms:"
+        print client.team.get_teamrooms()
+        #HRv2 API
+        print "HR: companies" 
+        print client.hr.get_companies()
+        print "HR: teams"
+        print client.hr.get_teams()
+        print "HR: offers"
+        print client.hr.get_offers()
+        print "HR: get_engagements"
+        print client.hr.get_engagements()   
+        print "HR: userroles"
+        print client.hr.get_user_role()
+        print "Get jobs"
+        print client.provider.get_jobs({'q': 'python'})    
+        print "Financial: withdrawal methods"
+        print client.finance.get_withdrawal_methods()
+        print "Revoke access"
+        print client.auth.revoke_token()    
+    except Exception, e:
+        print "Exception at %s %s" % (client.last_method, client.last_url)
+        raise e
 
 
 if __name__ == '__main__':
