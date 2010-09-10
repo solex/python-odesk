@@ -340,11 +340,8 @@ class Auth(Namespace):
 
     def check_token(self):
         url = 'keys/token'
-        try:
-            result = self.get(url)
-            return True
-        except HTTP403ForbiddenError:
-            return False
+        result = self.get(url)
+        return result['token'], result['auth_user']
 
     def revoke_token(self):
         url = 'keys/token'
